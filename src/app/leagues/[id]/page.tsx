@@ -162,7 +162,7 @@ export default async function LeaguePage({
             </div>
           )}
 
-          <PastPicks picks={myPicks ?? []} />
+          <PastPicks picks={(myPicks ?? []) as any} />
         </div>
 
         <MembersTable members={members ?? []} />
