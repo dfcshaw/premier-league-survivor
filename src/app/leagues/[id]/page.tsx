@@ -165,7 +165,7 @@ export default async function LeaguePage({
           <PastPicks picks={(myPicks ?? []) as any} />
         </div>
 
-        <MembersTable members={members ?? []} />
+        <MembersTable members={(members ?? []) as any} />
       </div>
     </section>
   );
