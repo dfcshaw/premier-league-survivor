@@ -82,6 +82,67 @@ export default async function LeaguePage({
   const currentPickLocked =
     !!myCurrentPick && lockedTeamIds.includes(myCurrentPick.team_id);
 
+  // ---- Real-time survivor computation (Feature 3) ----
+  const { data: allCurrentPicks } = await supabase
+    .from("picks")
+    .select("user_id, team_id")
+    .eq("league_id", league.id)
+    .eq("gameweek", league.current_gameweek);
+
+  const pickByUser = new Map<string, number>();
+  (allCurrentPicks ?? []).forEach((p: any) =>
+    pickByUser.set(p.user_id, p.team_id)
+  );
+
+  function resultForTeam(teamId: number): "win" | "draw" | "loss" | null {
+    for (const f of (fixtures ?? []) as any[]) {
+      if (f.status !== "finished") continue;
+      if (f.home_team_id === teamId) {
+        if (f.home_score > f.away_score) return "win";
+        if (f.home_score === f.away_score) return "draw";
+        return "loss";
+      }
+      if (f.away_team_id === teamId) {
+        if (f.away_score > f.home_score) return "win";
+        if (f.away_score === f.home_score) return "draw";
+        return "loss";
+      }
+    }
+    return null;
+  }
+
+  const allFixturesFinished =
+    (fixtures ?? []).length > 0 &&
+    (fixtures ?? []).every((f: any) => f.status === "finished");
+
+  const provisionalMembers = (members ?? []).map((m: any) => {
+    if (m.status !== "alive") {
+      return { ...m, provisional: "eliminated" as const };
+    }
+    const teamId = pickByUser.get(m.user_id);
+    if (!teamId) {
+      return {
+        ...m,
+        provisional: (allFixturesFinished ? "eliminated" : "alive") as
+          | "eliminated"
+          | "alive",
+        note: allFixturesFinished ? "no pick" : "no pick yet",
+      };
+    }
+    const r = resultForTeam(teamId);
+    if (r === null) return { ...m, provisional: "alive" as const, note: "pending" };
+    if (r === "win") return { ...m, provisional: "alive" as const, note: "won" };
+    return {
+      ...m,
+      provisional: "eliminated" as const,
+      note: r === "draw" ? "drew" : "lost",
+    };
+  });
+
+  const provisionalAliveCount = provisionalMembers.filter(
+    (m: any) => m.provisional === "alive"
+  ).length;	
+
   return (
     <section className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
@@ -91,7 +152,7 @@ export default async function LeaguePage({
           </Link>
           <h1 className="text-3xl font-bold mt-1">{league.name}</h1>
           <p className="text-white/60 text-sm">
-            Gameweek <strong>{league.current_gameweek}</strong> · {aliveCount}{" "}
+            Gameweek <strong>{league.current_gameweek}</strong> · {provisionalAliveCount}{" "}
             still alive · code{" "}
             <code className="text-pl-accent">{league.code}</code>
           </p>
@@ -174,7 +235,7 @@ export default async function LeaguePage({
           <PastPicks picks={(myPicks ?? []) as any} />
         </div>
 
-        <MembersTable members={(members ?? []) as any} />
+          <MembersTable members={provisionalMembers as any} />
       </div>
     </section>
   );

@@ -3,11 +3,20 @@ type Member = {
   status: "alive" | "eliminated" | string;
   eliminated_gameweek: number | null;
   profile: { username: string } | null;
+  provisional?: "alive" | "eliminated";
+  note?: string;
 };
 
 export default function MembersTable({ members }: { members: Member[] }) {
-  const alive = members.filter((m) => m.status === "alive");
-  const dead = members.filter((m) => m.status !== "alive");
+  const effective = (m: Member) => m.provisional ?? m.status;
+  const alive = members.filter((m) => effective(m) === "alive");
+  const dead = members.filter((m) => effective(m) !== "alive");
+
+  const dotColor = (note?: string) => {
+    if (note === "won") return "bg-pl-accent";
+    if (note === "no pick yet") return "bg-yellow-400";
+    return "bg-white/50";
+  };
 
   return (
     <aside className="card h-fit">
@@ -18,9 +27,14 @@ export default function MembersTable({ members }: { members: Member[] }) {
         </h3>
         <ul className="mt-1 space-y-1 text-sm">
           {alive.map((m) => (
-            <li key={m.user_id} className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-pl-accent" />
-              {m.profile?.username ?? "Player"}
+            <li key={m.user_id} className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-2">
+                <span className={"h-2 w-2 rounded-full " + dotColor(m.note)} />
+                {m.profile?.username ?? "Player"}
+              </span>
+              {m.note && (
+                <span className="text-xs text-white/50">{m.note}</span>
+              )}
             </li>
           ))}
           {alive.length === 0 && (
@@ -39,7 +53,9 @@ export default function MembersTable({ members }: { members: Member[] }) {
                 <span className="line-through">
                   {m.profile?.username ?? "Player"}
                 </span>
-                <span className="text-xs">GW {m.eliminated_gameweek ?? "?"}</span>
+                <span className="text-xs">
+                  {m.note ? m.note : `GW ${m.eliminated_gameweek ?? "?"}`}
+                </span>
               </li>
             ))}
           </ul>
