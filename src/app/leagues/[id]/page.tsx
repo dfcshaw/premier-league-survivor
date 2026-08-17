@@ -1,4 +1,5 @@
 import Link from "next/link";
+import KickoffRefresher from "@/components/KickoffRefresher";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PickForm from "@/components/PickForm";
@@ -103,6 +104,9 @@ export default async function LeaguePage({
           </form>
         )}
       </header>
+	<KickoffRefresher
+        kickoffs={(fixtures ?? []).map((f: any) => f.kickoff).filter(Boolean)}
+      />
 
       {searchParams.error && (
         <div className="card border-red-500/40 text-red-300 text-sm">
