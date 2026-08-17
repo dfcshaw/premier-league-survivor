@@ -23,7 +23,6 @@ export default async function LeaguePage({
     .select("id, name, code, current_gameweek, owner_id, status")
     .eq("id", params.id)
     .maybeSingle();
-
   if (!league) notFound();
 
   const { data: me } = await supabase
@@ -32,25 +31,21 @@ export default async function LeaguePage({
     .eq("league_id", league.id)
     .eq("user_id", user.id)
     .maybeSingle();
-
   if (!me) {
     redirect("/dashboard?error=You%20are%20not%20a%20member%20of%20that%20league");
   }
 
-  // Members
   const { data: members } = await supabase
     .from("league_members")
     .select("user_id, status, eliminated_gameweek, profile:profiles(username)")
     .eq("league_id", league.id)
     .order("status", { ascending: true });
 
-  // Teams reference
   const { data: teams } = await supabase
     .from("teams")
     .select("id, name, short_name")
     .order("name");
 
-  // Picks the current user has already made in this league (used for "used teams" + history)
   const { data: myPicks } = await supabase
     .from("picks")
     .select("gameweek, team_id, result, team:teams(name, short_name)")
@@ -58,7 +53,6 @@ export default async function LeaguePage({
     .eq("user_id", user.id)
     .order("gameweek");
 
-  // Current GW fixtures (for context)
   const { data: fixtures } = await supabase
     .from("fixtures")
     .select(
@@ -73,9 +67,19 @@ export default async function LeaguePage({
   const myCurrentPick = (myPicks ?? []).find(
     (p) => p.gameweek === league.current_gameweek
   );
-
   const isOwner = league.owner_id === user.id;
   const aliveCount = (members ?? []).filter((m) => m.status === "alive").length;
+
+  // Teams whose GW match has already kicked off — can't be picked/changed
+  const now = Date.now();
+  const lockedTeamIds: number[] = [];
+  (fixtures ?? []).forEach((f: any) => {
+    if (f.kickoff && new Date(f.kickoff).getTime() <= now) {
+      lockedTeamIds.push(f.home_team_id, f.away_team_id);
+    }
+  });
+  const currentPickLocked =
+    !!myCurrentPick && lockedTeamIds.includes(myCurrentPick.team_id);
 
   return (
     <section className="space-y-8">
@@ -119,8 +123,7 @@ export default async function LeaguePage({
             </h2>
             {me.status !== "alive" ? (
               <p className="mt-2 text-white/70 text-sm">
-                You were eliminated in GW {me.eliminated_gameweek ?? "?"}.
-                You can still watch how the league unfolds.
+                You were eliminated in GW {me.eliminated_gameweek ?? "?"}. You can still watch how the league unfolds.
               </p>
             ) : league.status === "completed" ? (
               <p className="mt-2 text-white/70 text-sm">
@@ -132,7 +135,9 @@ export default async function LeaguePage({
                 gameweek={league.current_gameweek}
                 teams={teams ?? []}
                 usedTeamIds={[...usedTeamIds]}
+                lockedTeamIds={lockedTeamIds}
                 currentPickTeamId={myCurrentPick?.team_id ?? null}
+                currentPickLocked={currentPickLocked}
               />
             )}
           </div>
