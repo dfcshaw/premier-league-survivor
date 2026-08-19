@@ -166,6 +166,12 @@ export default async function LeaguePage({
 >
   View all fixtures →
 </Link>
+<Link
+  href={`/leagues/${league.id}/records`}
+  className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4"
+>
+  Pool history & records →
+</Link>
         </div>
         {isOwner && (
           <form action={`/api/leagues/${league.id}/advance`} method="post">
