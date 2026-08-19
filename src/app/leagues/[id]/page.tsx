@@ -142,6 +142,10 @@ export default async function LeaguePage({
   const provisionalAliveCount = provisionalMembers.filter(
     (m: any) => m.provisional === "alive"
   ).length;	
+  const picksPerTeam = new Map<number, number>();
+  (allCurrentPicks ?? []).forEach((p: any) => {
+    picksPerTeam.set(p.team_id, (picksPerTeam.get(p.team_id) ?? 0) + 1);
+  });
 
   return (
     <section className="space-y-8">
@@ -218,22 +222,38 @@ export default async function LeaguePage({
               <h2 className="text-lg font-semibold">
                 GW {league.current_gameweek} fixtures
               </h2>
-              <ul className="mt-3 divide-y divide-white/10 text-sm">
-                {fixtures.map((f: any) => (
-                  <li key={f.id} className="flex items-center justify-between py-2">
-                    <span>
-                      {f.home?.name} <span className="text-white/40">vs</span>{" "}
-                      {f.away?.name}
-                    </span>
-                    <span className="text-white/60 text-xs">
-                      {f.status === "finished"
-                        ? `${f.home_score}–${f.away_score}`
-                        : f.kickoff
-                        ? new Date(f.kickoff).toLocaleString()
-                        : "TBD"}
-                    </span>
-                  </li>
-                ))}
+                            <ul className="mt-3 divide-y divide-white/10 text-sm">
+                {fixtures.map((f: any) => {
+                  const kickedOff =
+                    f.kickoff && new Date(f.kickoff).getTime() <= Date.now();
+                  const homeCount = picksPerTeam.get(f.home_team_id) ?? 0;
+                  const awayCount = picksPerTeam.get(f.away_team_id) ?? 0;
+                  return (
+                    <li key={f.id} className="py-2">
+                      <div className="flex items-center justify-between">
+                        <span>
+                          {f.home?.name}{" "}
+                          <span className="text-white/40">vs</span>{" "}
+                          {f.away?.name}
+                        </span>
+                        <span className="text-white/60 text-xs">
+                          {f.status === "finished"
+                            ? `${f.home_score}–${f.away_score}`
+                            : f.kickoff
+                            ? new Date(f.kickoff).toLocaleString()
+                            : "TBD"}
+                        </span>
+                      </div>
+                      {kickedOff && (homeCount > 0 || awayCount > 0) && (
+                        <div className="text-xs text-white/50 mt-1">
+                          {homeCount} pick{homeCount !== 1 ? "s" : ""} for{" "}
+                          {f.home?.short_name} · {awayCount} pick
+                          {awayCount !== 1 ? "s" : ""} for {f.away?.short_name}
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
