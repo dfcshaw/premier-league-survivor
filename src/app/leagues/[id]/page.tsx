@@ -156,6 +156,12 @@ export default async function LeaguePage({
             still alive · code{" "}
             <code className="text-pl-accent">{league.code}</code>
           </p>
+<Link
+  href={`/leagues/${league.id}/fixtures`}
+  className="inline-block text-sm text-pl-accent hover:underline mt-2"
+>
+  View all fixtures →
+</Link>
         </div>
         {isOwner && (
           <form action={`/api/leagues/${league.id}/advance`} method="post">
