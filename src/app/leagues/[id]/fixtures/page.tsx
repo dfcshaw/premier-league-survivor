@@ -51,9 +51,9 @@ export default async function FixturesPage({
 
   const { data: fixtures } = await supabase
     .from("fixtures")
-    .select(
+        .select(
       "id, gameweek, kickoff, status, home_score, away_score, " +
-        "home:home_team_id(name,short_name), away:away_team_id(name,short_name)"
+        "home:home_team_id(name,short_name,crest_url), away:away_team_id(name,short_name,crest_url)"
     )
     .eq("gameweek", selectedGw)
     .order("kickoff");
@@ -115,9 +115,24 @@ export default async function FixturesPage({
           <ul className="mt-3 divide-y divide-pl-purple/10 text-sm">
             {fixtures.map((f: any) => (
               <li key={f.id} className="flex items-center justify-between py-2">
-                <span>
-                  {f.home?.name}{" "}
-                  <span className="text-pl-purple/40">vs</span> {f.away?.name}
+                                <span className="flex items-center gap-2">
+                  {f.home?.crest_url && (
+                    <img
+                      src={f.home.crest_url}
+                      alt=""
+                      className="h-4 w-4 object-contain"
+                    />
+                  )}
+                  <span>{f.home?.name}</span>
+                  <span className="text-pl-purple/40">vs</span>
+                  {f.away?.crest_url && (
+                    <img
+                      src={f.away.crest_url}
+                      alt=""
+                      className="h-4 w-4 object-contain"
+                    />
+                  )}
+                  <span>{f.away?.name}</span>
                 </span>
                 <span className="text-pl-purple/60 text-xs">
                   {f.status === "finished"

@@ -58,7 +58,7 @@ export default async function LeaguePage({
     .from("fixtures")
     .select(
       "id, gameweek, kickoff, status, home_score, away_score, " +
-        "home:home_team_id(name,short_name), away:away_team_id(name,short_name), " +
+           "home:home_team_id(name,short_name,crest_url), away:away_team_id(name,short_name,crest_url), " +
         "home_team_id, away_team_id"
     )
     .eq("gameweek", league.current_gameweek)
@@ -237,10 +237,24 @@ export default async function LeaguePage({
                   return (
                     <li key={f.id} className="py-2">
                       <div className="flex items-center justify-between">
-                        <span>
-                          {f.home?.name}{" "}
-                          <span className="text-pl-purple/40">vs</span>{" "}
-                          {f.away?.name}
+                                                <span className="flex items-center gap-2">
+                          {f.home?.crest_url && (
+                            <img
+                              src={f.home.crest_url}
+                              alt=""
+                              className="h-4 w-4 object-contain"
+                            />
+                          )}
+                          <span>{f.home?.name}</span>
+                          <span className="text-pl-purple/40">vs</span>
+                          {f.away?.crest_url && (
+                            <img
+                              src={f.away.crest_url}
+                              alt=""
+                              className="h-4 w-4 object-contain"
+                            />
+                          )}
+                          <span>{f.away?.name}</span>
                         </span>
                         <span className="text-pl-purple/60 text-xs">
                           {f.status === "finished"
