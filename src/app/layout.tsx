@@ -22,7 +22,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen">
-        <header className="border-b border-white/10 bg-pl-purple">
+        <header className="border-b border-pl-purple/10 bg-pl-purple">
           <div className="mx-auto flex max-w-5xl items-center justify-between p-4">
             <Link href="/" className="text-lg font-bold text-pl-accent">
               PL Survivor

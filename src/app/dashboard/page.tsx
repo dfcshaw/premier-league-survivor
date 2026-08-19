@@ -71,7 +71,7 @@ export default async function Dashboard() {
           <h1 className="text-3xl font-bold">
             Welcome{profile?.username ? `, ${profile.username}` : ""}.
           </h1>
-          <p className="text-white/70 text-sm">Pick wisely. Pick once.</p>
+          <p className="text-pl-purple/70 text-sm">Pick wisely. Pick once.</p>
         </div>
         <div className="flex gap-2">
           <Link href="/leagues/new" className="btn">New league</Link>
@@ -82,7 +82,7 @@ export default async function Dashboard() {
       <div>
         <h2 className="text-lg font-semibold mb-3">Your leagues</h2>
         {rows.length === 0 ? (
-          <div className="card text-white/70">
+          <div className="card text-pl-purple/70">
             You&apos;re not in any leagues yet. Create one and share the code,
             or join one with a friend&apos;s code.
           </div>
@@ -98,13 +98,13 @@ export default async function Dashboard() {
                         "text-xs px-2 py-0.5 rounded-full " +
                         (l.member_status === "alive"
                           ? "bg-pl-accent/20 text-pl-accent"
-                          : "bg-red-500/20 text-red-300")
+                          : "bg-red-500/20 text-red-700")
                       }
                     >
                       {l.member_status}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-white/60">
+                  <div className="mt-2 text-sm text-pl-purple/60">
                     GW {l.current_gameweek} · {l.member_count} player
                     {l.member_count === 1 ? "" : "s"} · code{" "}
                     <code className="text-pl-accent">{l.code}</code>

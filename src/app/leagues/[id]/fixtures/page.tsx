@@ -63,12 +63,12 @@ export default async function FixturesPage({
       <header>
         <Link
           href={`/leagues/${league.id}`}
-          className="text-sm text-white/60 hover:underline"
+          className="text-sm text-pl-purple/60 hover:underline"
         >
           ← Back to league
         </Link>
         <h1 className="text-3xl font-bold mt-1">{league.name} — Fixtures</h1>
-        <p className="text-white/60 text-sm">
+        <p className="text-pl-purple/60 text-sm">
           Currently on Gameweek {league.current_gameweek}.
         </p>
       </header>
@@ -87,8 +87,8 @@ export default async function FixturesPage({
                 (isSelected
                   ? "border-pl-accent bg-pl-accent/10 text-pl-accent"
                   : isCurrent
-                  ? "border-white/30 bg-white/[0.05] text-white"
-                  : "border-white/15 bg-white/[0.02] text-white/70 hover:border-white/30")
+                  ? "border-pl-purple/30 bg-pl-purple/10 text-white"
+                  : "border-pl-purple/15 bg-pl-purple/5 text-pl-purple/70 hover:border-pl-purple/30")
               }
               scroll={false}
             >
@@ -107,19 +107,19 @@ export default async function FixturesPage({
       <div className="card">
         <h2 className="text-lg font-semibold">Gameweek {selectedGw}</h2>
         {(!fixtures || fixtures.length === 0) && (
-          <p className="mt-3 text-sm text-white/60">
+          <p className="mt-3 text-sm text-pl-purple/60">
             No fixtures scheduled for this gameweek.
           </p>
         )}
         {fixtures && fixtures.length > 0 && (
-          <ul className="mt-3 divide-y divide-white/10 text-sm">
+          <ul className="mt-3 divide-y divide-pl-purple/10 text-sm">
             {fixtures.map((f: any) => (
               <li key={f.id} className="flex items-center justify-between py-2">
                 <span>
                   {f.home?.name}{" "}
-                  <span className="text-white/40">vs</span> {f.away?.name}
+                  <span className="text-pl-purple/40">vs</span> {f.away?.name}
                 </span>
-                <span className="text-white/60 text-xs">
+                <span className="text-pl-purple/60 text-xs">
                   {f.status === "finished"
                     ? `${f.home_score}–${f.away_score}`
                     : f.kickoff

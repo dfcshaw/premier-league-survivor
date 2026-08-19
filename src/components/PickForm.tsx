@@ -28,7 +28,7 @@ export default function PickForm({
   if (currentPickLocked) {
     const team = teams.find((t) => t.id === currentPickTeamId);
     return (
-      <p className="mt-3 text-white/70 text-sm">
+      <p className="mt-3 text-pl-purple/70 text-sm">
         Your GW {gameweek} pick{" "}
         <strong className="text-white">{team?.name ?? "—"}</strong> is locked in — its match has already kicked off.
       </p>
@@ -40,7 +40,7 @@ export default function PickForm({
       <input type="hidden" name="league_id" value={leagueId} />
       <input type="hidden" name="gameweek" value={gameweek} />
       <input type="hidden" name="team_id" value={selected ?? ""} />
-      <p className="text-white/70 text-sm">
+      <p className="text-pl-purple/70 text-sm">
         Pick one team to win this gameweek. You can only pick a team until their match kicks off. Teams you&apos;ve already used are disabled. A draw or loss eliminates you.
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -58,10 +58,10 @@ export default function PickForm({
               className={
                 "rounded-md border px-2 py-3 text-sm text-left transition " +
                 (disabled
-                  ? "border-white/5 bg-white/[0.02] text-white/30 line-through cursor-not-allowed"
+                  ? "border-pl-purple/5 bg-pl-purple/5 text-pl-purple/30 line-through cursor-not-allowed"
                   : isSelected
                   ? "border-pl-accent bg-pl-accent/10 text-pl-accent"
-                  : "border-white/15 bg-white/[0.03] hover:border-white/30")
+                  : "border-pl-purple/15 bg-white hover:border-pl-purple/30")
               }
               title={
                 used

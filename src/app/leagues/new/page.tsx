@@ -8,7 +8,7 @@ export default function NewLeaguePage({
   return (
     <section className="mx-auto max-w-md card">
       <h1 className="text-2xl font-bold">Create a league</h1>
-      <p className="text-white/70 text-sm mt-1">
+      <p className="text-pl-purple/70 text-sm mt-1">
         You&apos;ll get a join code to share with your mates.
       </p>
       <form action={createLeague} className="mt-6 space-y-4">

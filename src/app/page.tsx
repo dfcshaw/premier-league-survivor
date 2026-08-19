@@ -17,7 +17,7 @@ export default async function Landing() {
           One pick. <br />
           <span className="text-pl-accent">Don&apos;t go out.</span>
         </h1>
-        <p className="mt-4 text-white/70">
+        <p className="mt-4 text-pl-purple/70">
           The classic Premier League survivor pool. Pick one team to win each
           gameweek. You can&apos;t pick the same team twice. A draw or a loss
           and you&apos;re out. Last one standing wins.

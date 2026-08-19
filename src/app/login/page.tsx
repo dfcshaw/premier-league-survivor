@@ -9,7 +9,7 @@ export default function LoginPage({
   return (
     <section className="mx-auto max-w-md card">
       <h1 className="text-2xl font-bold">Log in</h1>
-      <p className="text-white/70 text-sm mt-1">Welcome back.</p>
+      <p className="text-pl-purple/70 text-sm mt-1">Welcome back.</p>
       <form action={login} className="mt-6 space-y-4">
         <div>
           <label className="label" htmlFor="email">Email</label>
@@ -24,7 +24,7 @@ export default function LoginPage({
         )}
         <button className="btn w-full" type="submit">Log in</button>
       </form>
-      <p className="mt-4 text-sm text-white/60">
+      <p className="mt-4 text-sm text-pl-purple/60">
         No account? <Link className="text-pl-accent" href="/signup">Sign up</Link>
       </p>
     </section>

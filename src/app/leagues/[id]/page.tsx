@@ -151,11 +151,11 @@ export default async function LeaguePage({
     <section className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <Link href="/dashboard" className="text-sm text-white/60 hover:underline">
+          <Link href="/dashboard" className="text-sm text-pl-purple/60 hover:underline">
             ← All leagues
           </Link>
           <h1 className="text-3xl font-bold mt-1">{league.name}</h1>
-          <p className="text-white/60 text-sm">
+          <p className="text-pl-purple/60 text-sm">
             Gameweek <strong>{league.current_gameweek}</strong> · {provisionalAliveCount}{" "}
             still alive · code{" "}
             <code className="text-pl-accent">{league.code}</code>
@@ -180,7 +180,7 @@ export default async function LeaguePage({
       />
 
       {searchParams.error && (
-        <div className="card border-red-500/40 text-red-300 text-sm">
+        <div className="card border-red-500/40 text-red-700 text-sm">
           {searchParams.error}
         </div>
       )}
@@ -197,11 +197,11 @@ export default async function LeaguePage({
               GW {league.current_gameweek} pick
             </h2>
             {me.status !== "alive" ? (
-              <p className="mt-2 text-white/70 text-sm">
+              <p className="mt-2 text-pl-purple/70 text-sm">
                 You were eliminated in GW {me.eliminated_gameweek ?? "?"}. You can still watch how the league unfolds.
               </p>
             ) : league.status === "completed" ? (
-              <p className="mt-2 text-white/70 text-sm">
+              <p className="mt-2 text-pl-purple/70 text-sm">
                 This league has finished.
               </p>
             ) : (
@@ -222,7 +222,7 @@ export default async function LeaguePage({
               <h2 className="text-lg font-semibold">
                 GW {league.current_gameweek} fixtures
               </h2>
-                            <ul className="mt-3 divide-y divide-white/10 text-sm">
+                            <ul className="mt-3 divide-y divide-pl-purple/10 text-sm">
                 {fixtures.map((f: any) => {
                   const kickedOff =
                     f.kickoff && new Date(f.kickoff).getTime() <= Date.now();
@@ -233,10 +233,10 @@ export default async function LeaguePage({
                       <div className="flex items-center justify-between">
                         <span>
                           {f.home?.name}{" "}
-                          <span className="text-white/40">vs</span>{" "}
+                          <span className="text-pl-purple/40">vs</span>{" "}
                           {f.away?.name}
                         </span>
-                        <span className="text-white/60 text-xs">
+                        <span className="text-pl-purple/60 text-xs">
                           {f.status === "finished"
                             ? `${f.home_score}–${f.away_score}`
                             : f.kickoff
@@ -245,7 +245,7 @@ export default async function LeaguePage({
                         </span>
                       </div>
                       {kickedOff && (homeCount > 0 || awayCount > 0) && (
-                        <div className="text-xs text-white/50 mt-1">
+                        <div className="text-xs text-pl-purple/50 mt-1">
                           {homeCount} pick{homeCount !== 1 ? "s" : ""} for{" "}
                           {f.home?.short_name} · {awayCount} pick
                           {awayCount !== 1 ? "s" : ""} for {f.away?.short_name}
