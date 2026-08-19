@@ -29,7 +29,7 @@ export default function SignupPage({
         <button className="btn w-full" type="submit">Sign up</button>
       </form>
       <p className="mt-4 text-sm text-pl-purple/60">
-        Already have an account? <Link className="text-pl-accent" href="/login">Log in</Link>
+        Already have an account? <Link className="text-pl-accent-text" href="/login">Log in</Link>
       </p>
     </section>
   );

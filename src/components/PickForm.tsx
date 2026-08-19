@@ -60,7 +60,7 @@ export default function PickForm({
                 (disabled
                   ? "border-pl-purple/5 bg-pl-purple/5 text-pl-purple/30 line-through cursor-not-allowed"
                   : isSelected
-                  ? "border-pl-accent bg-pl-accent/10 text-pl-accent"
+                  ? "border-pl-accent bg-pl-accent/10 text-pl-accent-text"
                   : "border-pl-purple/15 bg-white hover:border-pl-purple/30")
               }
               title={

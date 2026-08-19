@@ -25,7 +25,7 @@ export default function LoginPage({
         <button className="btn w-full" type="submit">Log in</button>
       </form>
       <p className="mt-4 text-sm text-pl-purple/60">
-        No account? <Link className="text-pl-accent" href="/signup">Sign up</Link>
+        No account? <Link className="text-pl-accent-text" href="/signup">Sign up</Link>
       </p>
     </section>
   );

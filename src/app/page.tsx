@@ -15,7 +15,7 @@ export default async function Landing() {
         <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl">
           One team. <br />
           One pick. <br />
-          <span className="text-pl-accent">Don&apos;t go out.</span>
+          <span className="text-pl-accent-text">Don&apos;t go out.</span>
         </h1>
         <p className="mt-4 text-pl-purple/70">
           The classic Premier League survivor pool. Pick one team to win each

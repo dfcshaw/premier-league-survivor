@@ -158,11 +158,11 @@ export default async function LeaguePage({
           <p className="text-pl-purple/60 text-sm">
             Gameweek <strong>{league.current_gameweek}</strong> · {provisionalAliveCount}{" "}
             still alive · code{" "}
-            <code className="text-pl-accent">{league.code}</code>
+            <code className="text-pl-accent-text">{league.code}</code>
           </p>
 <Link
   href={`/leagues/${league.id}/fixtures`}
-  className="inline-block text-sm text-pl-accent hover:underline mt-2"
+  className="inline-block text-sm text-pl-accent-text hover:underline mt-2"
 >
   View all fixtures →
 </Link>
@@ -185,7 +185,7 @@ export default async function LeaguePage({
         </div>
       )}
       {searchParams.ok && (
-        <div className="card border-pl-accent/40 text-pl-accent text-sm">
+        <div className="card border-pl-accent/40 text-pl-accent-text text-sm">
           Pick saved.
         </div>
       )}

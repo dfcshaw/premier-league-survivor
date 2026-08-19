@@ -4,11 +4,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        pl: {
+                pl: {
           purple: "#37003c",
           "purple-soft": "#5a2361",
           accent: "#00ff85",
           "accent-dark": "#00cc6a",
+          "accent-text": "#007a3d",
           bg: "#f7f4f9",
           surface: "#ffffff",
           border: "#e5e0eb",

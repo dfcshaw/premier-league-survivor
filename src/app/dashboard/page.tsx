@@ -97,7 +97,7 @@ export default async function Dashboard() {
                       className={
                         "text-xs px-2 py-0.5 rounded-full " +
                         (l.member_status === "alive"
-                          ? "bg-pl-accent/20 text-pl-accent"
+                          ? "bg-pl-accent/20 text-pl-accent-text"
                           : "bg-red-500/20 text-red-700")
                       }
                     >
@@ -107,7 +107,7 @@ export default async function Dashboard() {
                   <div className="mt-2 text-sm text-pl-purple/60">
                     GW {l.current_gameweek} · {l.member_count} player
                     {l.member_count === 1 ? "" : "s"} · code{" "}
-                    <code className="text-pl-accent">{l.code}</code>
+                    <code className="text-pl-accent-text">{l.code}</code>
                   </div>
                 </Link>
               </li>

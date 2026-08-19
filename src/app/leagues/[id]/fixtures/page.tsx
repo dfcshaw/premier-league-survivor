@@ -85,7 +85,7 @@ export default async function FixturesPage({
               className={
                 "shrink-0 rounded-md border px-3 py-1.5 text-sm transition " +
                 (isSelected
-                  ? "border-pl-accent bg-pl-accent/10 text-pl-accent"
+                  ? "border-pl-accent bg-pl-accent/10 text-pl-accent-text"
                   : isCurrent
                   ? "border-pl-purple/30 bg-pl-purple/10 text-white"
                   : "border-pl-purple/15 bg-pl-purple/5 text-pl-purple/70 hover:border-pl-purple/30")

@@ -6,7 +6,7 @@ type Pick = {
 };
 
 const RESULT_STYLE: Record<string, string> = {
-  win: "text-pl-accent",
+  win: "text-pl-accent-text",
   draw: "text-yellow-300",
   loss: "text-red-700",
   pending: "text-pl-purple/60",
