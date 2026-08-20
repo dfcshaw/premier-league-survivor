@@ -260,7 +260,15 @@ export default async function LeaguePage({
                           {f.status === "finished"
                             ? `${f.home_score}–${f.away_score}`
                             : f.kickoff
-                            ? new Date(f.kickoff).toLocaleString()
+                            ? new Date(f.kickoff).toLocaleString("en-US", {
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  timeZone: "America/New_York",
+  timeZoneName: "short",
+})
                             : "TBD"}
                         </span>
                       </div>
