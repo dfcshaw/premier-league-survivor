@@ -235,7 +235,7 @@ export default async function LeaguePage({
                   const homeCount = picksPerTeam.get(f.home_team_id) ?? 0;
                   const awayCount = picksPerTeam.get(f.away_team_id) ?? 0;
                   return (
-                    <li key={f.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 py-2">
+                    <li key={f.id} className="flex items-center justify-between py-2">
                       <div className="flex items-center justify-between">
                                                 <span className="flex items-center gap-2">
                           {f.home?.crest_url && (
@@ -246,7 +246,7 @@ export default async function LeaguePage({
                             />
                           )}
                           <span>{f.home?.name}</span>
-                          <span className="text-pl-purple/40">vs</span>
+                          <span className="text-pl-purple/60 text-xs pl-8 whitespace-nowrap">
                           {f.away?.crest_url && (
                             <img
                               src={f.away.crest_url}
