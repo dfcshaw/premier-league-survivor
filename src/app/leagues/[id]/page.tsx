@@ -235,7 +235,7 @@ export default async function LeaguePage({
                   const homeCount = picksPerTeam.get(f.home_team_id) ?? 0;
                   const awayCount = picksPerTeam.get(f.away_team_id) ?? 0;
                   return (
-                    <li key={f.id} className="py-2">
+                    <li key={f.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 py-2">
                       <div className="flex items-center justify-between">
                                                 <span className="flex items-center gap-2">
                           {f.home?.crest_url && (

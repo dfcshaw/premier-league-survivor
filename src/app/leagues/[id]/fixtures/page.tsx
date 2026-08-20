@@ -114,7 +114,7 @@ export default async function FixturesPage({
         {fixtures && fixtures.length > 0 && (
           <ul className="mt-3 divide-y divide-pl-purple/10 text-sm">
             {fixtures.map((f: any) => (
-              <li key={f.id} className="flex items-center justify-between py-2">
+              <li key={f.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 py-2">
                                 <span className="flex items-center gap-2">
                   {f.home?.crest_url && (
                     <img
