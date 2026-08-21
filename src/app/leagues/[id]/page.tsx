@@ -40,7 +40,7 @@ export default async function LeaguePage({
 
   const { data: teams } = await supabase
     .from("teams")
-    .select("id, name, short_name")
+    .select("id, name, short_name, crest_url")
     .order("name");
 
   const { data: myPicks } = await supabase
@@ -102,20 +102,29 @@ export default async function LeaguePage({
   const allFixturesFinished =
     (fixtures ?? []).length > 0 && (fixtures ?? []).every((f: any) => f.status === "finished");
 
-  const provisionalMembers = (members ?? []).map((m: any) => {
-    if (m.status !== "alive") return { ...m, provisional: "eliminated" as const };
+  const teamById = new Map<number, any>();
+  (teams ?? []).forEach((t: any) => teamById.set(t.id, t));
+
+    const provisionalMembers = (members ?? []).map((m: any) => {
     const teamId = pickByUser.get(m.user_id);
+    const kickedOff = teamId ? lockedTeamIds.includes(teamId) : false;
+    const pickedTeam = kickedOff && teamId ? teamById.get(teamId) : null;
+
+    if (m.status !== "alive") {
+      return { ...m, provisional: "eliminated" as const, pickedTeam };
+    }
     if (!teamId) {
       return {
         ...m,
         provisional: (allFixturesFinished ? "eliminated" : "alive") as "eliminated" | "alive",
         note: allFixturesFinished ? "no pick" : "no pick yet",
+        pickedTeam: null,
       };
     }
     const r = resultForTeam(teamId);
-    if (r === null) return { ...m, provisional: "alive" as const, note: "pending" };
-    if (r === "win") return { ...m, provisional: "alive" as const, note: "won" };
-    return { ...m, provisional: "eliminated" as const, note: r === "draw" ? "drew" : "lost" };
+    if (r === null) return { ...m, provisional: "alive" as const, note: "pending", pickedTeam };
+    if (r === "win") return { ...m, provisional: "alive" as const, note: "won", pickedTeam };
+    return { ...m, provisional: "eliminated" as const, note: r === "draw" ? "drew" : "lost", pickedTeam };
   });
 
   const provisionalAliveCount = provisionalMembers.filter((m: any) => m.provisional === "alive").length;

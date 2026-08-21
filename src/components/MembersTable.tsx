@@ -5,6 +5,7 @@ type Member = {
   profile: { username: string } | null;
   provisional?: "alive" | "eliminated";
   note?: string;
+  pickedTeam?: { name: string; short_name: string; crest_url?: string } | null;
 };
 
 export default function MembersTable({ members }: { members: Member[] }) {
@@ -18,6 +19,16 @@ export default function MembersTable({ members }: { members: Member[] }) {
     return "bg-pl-purple/50";
   };
 
+  const renderPick = (m: Member) =>
+    m.pickedTeam ? (
+      <span className="flex items-center gap-1 text-xs text-pl-purple/60">
+        {m.pickedTeam.crest_url && (
+          <img src={m.pickedTeam.crest_url} alt="" className="h-3 w-3 object-contain" />
+        )}
+        {m.pickedTeam.short_name}
+      </span>
+    ) : null;
+
   return (
     <aside className="card h-fit">
       <h2 className="text-lg font-semibold">Players</h2>
@@ -28,18 +39,17 @@ export default function MembersTable({ members }: { members: Member[] }) {
         <ul className="mt-1 space-y-1 text-sm">
           {alive.map((m) => (
             <li key={m.user_id} className="flex items-center justify-between gap-2">
-              <span className="flex items-center gap-2">
-                <span className={"h-2 w-2 rounded-full " + dotColor(m.note)} />
-                {m.profile?.username ?? "Player"}
+              <span className="flex items-center gap-2 min-w-0">
+                <span className={"h-2 w-2 rounded-full shrink-0 " + dotColor(m.note)} />
+                <span className="truncate">{m.profile?.username ?? "Player"}</span>
+                {renderPick(m)}
               </span>
               {m.note && (
-                <span className="text-xs text-pl-purple/50">{m.note}</span>
+                <span className="text-xs text-pl-purple/50 shrink-0">{m.note}</span>
               )}
             </li>
           ))}
-          {alive.length === 0 && (
-            <li className="text-pl-purple/40">No survivors.</li>
-          )}
+          {alive.length === 0 && <li className="text-pl-purple/40">No survivors.</li>}
         </ul>
       </div>
       {dead.length > 0 && (
@@ -49,11 +59,14 @@ export default function MembersTable({ members }: { members: Member[] }) {
           </h3>
           <ul className="mt-1 space-y-1 text-sm text-pl-purple/60">
             {dead.map((m) => (
-              <li key={m.user_id} className="flex items-center justify-between">
-                <span className="line-through">
-                  {m.profile?.username ?? "Player"}
+              <li key={m.user_id} className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2 min-w-0">
+                  <span className="line-through truncate">
+                    {m.profile?.username ?? "Player"}
+                  </span>
+                  {renderPick(m)}
                 </span>
-                <span className="text-xs">
+                <span className="text-xs shrink-0">
                   {m.note ? m.note : `GW ${m.eliminated_gameweek ?? "?"}`}
                 </span>
               </li>
