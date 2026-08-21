@@ -142,7 +142,7 @@ export default async function LeaguePage({
   const provisionalAliveCount = provisionalMembers.filter(
     (m: any) => m.provisional === "alive"
   ).length;	
-  const picksPerTeam = new Map<number, number>();
+  const picksPerTeam: Map<number, number> = new Map();
   (allCurrentPicks ?? []).forEach((p: any) => {
     picksPerTeam.set(p.team_id, (picksPerTeam.get(p.team_id) ?? 0) + 1);
   });
