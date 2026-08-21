@@ -223,55 +223,69 @@ export default async function LeaguePage({
             )}
           </div>
 
-          {fixtures && fixtures.length > 0 && (
+                    {fixtures && fixtures.length > 0 && (
             <div className="card">
               <h2 className="text-lg font-semibold">
                 GW {league.current_gameweek} fixtures
               </h2>
-                            <ul className="mt-3 divide-y divide-pl-purple/10 text-sm">
+              <ul className="mt-3 divide-y divide-pl-purple/10 text-sm">
                 {fixtures.map((f: any) => {
                   const kickedOff =
                     f.kickoff && new Date(f.kickoff).getTime() <= Date.now();
                   const homeCount = picksPerTeam.get(f.home_team_id) ?? 0;
                   const awayCount = picksPerTeam.get(f.away_team_id) ?? 0;
                   return (
-                    <li key={f.id} className="grid grid-cols-[1fr_220px] items-center py-2">
-                      <div className="flex items-center justify-between">
-                                                <span className="flex items-center gap-2">
-                          {f.home?.crest_url && (
-                            <img
-                              src={f.home.crest_url}
-                              alt=""
-                              className="h-4 w-4 object-contain"
-                            />
-                          )}
-                          <span>{f.home?.name}</span>
-                          <span className="text-pl-purple/60 text-xs pl-8 whitespace-nowrap">
-                          {f.away?.crest_url && (
-                            <img
-                              src={f.away.crest_url}
-                              alt=""
-                              className="h-4 w-4 object-contain"
-                            />
-                          )}
-                          <span>{f.away?.name}</span>
-                        </span>
-                        <span className="text-pl-purple/60 text-xs text-right whitespace-nowrap">
-                          {f.status === "finished"
-                            ? `${f.home_score}–${f.away_score}`
-                            : f.kickoff
-                            ? new Date(f.kickoff).toLocaleString("en-US", {
-  weekday: "short",
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "America/New_York",
-  timeZoneName: "short",
-})
-                            : "TBD"}
-                        </span>
-                      </div>
+                    <li
+                      key={f.id}
+                      className="grid grid-cols-[1fr_220px] items-center py-2"
+                    >
+                      <span className="flex items-center gap-2">
+                        {f.home?.crest_url && (
+                          <img
+                            src={f.home.crest_url}
+                            alt=""
+                            className="h-4 w-4 object-contain"
+                          />
+                        )}
+                        <span>{f.home?.name}</span>
+                        <span className="text-pl-purple/40">vs</span>
+                        {f.away?.crest_url && (
+                          <img
+                            src={f.away.crest_url}
+                            alt=""
+                            className="h-4 w-4 object-contain"
+                          />
+                        )}
+                        <span>{f.away?.name}</span>
+                      </span>
+                      <span className="text-pl-purple/60 text-xs text-right whitespace-nowrap">
+                        {f.status === "finished"
+                          ? `${f.home_score}–${f.away_score}`
+                          : f.kickoff
+                          ? new Date(f.kickoff).toLocaleString("en-US", {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                              hour: "numeric",
+                              minute: "2-digit",
+                              timeZone: "America/New_York",
+                              timeZoneName: "short",
+                            })
+                          : "TBD"}
+                      </span>
+                      {kickedOff && (homeCount > 0 || awayCount > 0) && (
+                        <div className="col-span-2 text-xs text-pl-purple/50 mt-1">
+                          {homeCount} pick{homeCount !== 1 ? "s" : ""} for{" "}
+                          {f.home?.short_name} · {awayCount} pick
+                          {awayCount !== 1 ? "s" : ""} for {f.away?.short_name}
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
                       {kickedOff && (homeCount > 0 || awayCount > 0) && (
                         <div className="text-xs text-pl-purple/50 mt-1">
                           {homeCount} pick{homeCount !== 1 ? "s" : ""} for{" "}
