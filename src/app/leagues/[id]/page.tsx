@@ -235,7 +235,7 @@ export default async function LeaguePage({
                   const homeCount = picksPerTeam.get(f.home_team_id) ?? 0;
                   const awayCount = picksPerTeam.get(f.away_team_id) ?? 0;
                   return (
-                    <li key={f.id} className="flex items-center justify-between py-2">
+                    <li key={f.id} className="grid grid-cols-[1fr_220px] items-center py-2">
                       <div className="flex items-center justify-between">
                                                 <span className="flex items-center gap-2">
                           {f.home?.crest_url && (
@@ -256,7 +256,7 @@ export default async function LeaguePage({
                           )}
                           <span>{f.away?.name}</span>
                         </span>
-                        <span className="text-pl-purple/60 text-xs">
+                        <span className="text-pl-purple/60 text-xs text-right whitespace-nowrap">
                           {f.status === "finished"
                             ? `${f.home_score}–${f.away_score}`
                             : f.kickoff
