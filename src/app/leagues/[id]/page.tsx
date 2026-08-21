@@ -141,6 +141,9 @@ export default async function LeaguePage({
           <Link href={`/leagues/${league.id}/records`} className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4">
             Pool history & records →
           </Link>
+<Link href={`/leagues/${league.id}/history`} className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4">
+  Pick history →
+</Link>
         </div>
         {isOwner && (
           <form action={`/api/leagues/${league.id}/advance`} method="post">
