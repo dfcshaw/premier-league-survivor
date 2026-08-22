@@ -1,3 +1,4 @@
+import { CHAMPIONS } from "@/lib/champions";
 type Member = {
   user_id: string;
   status: "alive" | "eliminated" | string;
@@ -74,8 +75,17 @@ export default function MembersTable({ members }: { members: Member[] }) {
         <span className="flex items-center gap-2 min-w-0">
           <span className={"h-2 w-2 rounded-full shrink-0 " + dot} />
           <span className={"truncate " + nameClass}>
-            {m.profile?.username ?? "Player"}
-          </span>
+  {m.profile?.username ?? "Player"}
+</span>
+{m.profile?.username && CHAMPIONS[m.profile.username] && (
+  <span
+    title={`Champion ${CHAMPIONS[m.profile.username].join(", ")}`}
+    className="text-xs text-pl-accent-text/70 shrink-0"
+    aria-label="Past champion"
+  >
+    ★
+  </span>
+)}
           {renderPick(m)}
         </span>
         {noteText && (
