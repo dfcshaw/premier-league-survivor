@@ -9,71 +9,134 @@ type Member = {
 };
 
 export default function MembersTable({ members }: { members: Member[] }) {
-  const effective = (m: Member) => m.provisional ?? m.status;
-  const alive = members.filter((m) => effective(m) === "alive");
-  const dead = members.filter((m) => effective(m) !== "alive");
+  const byName = (a: Member, b: Member) =>
+    (a.profile?.username ?? "").localeCompare(b.profile?.username ?? "");
 
-  const dotColor = (note?: string) => {
-    if (note === "won") return "bg-pl-accent";
-    if (note === "no pick yet") return "bg-yellow-400";
-    return "bg-pl-purple/50";
-  };
+  // Groups
+  const safe = members
+    .filter((m) => m.status === "alive" && m.note === "won")
+    .sort(byName);
+  const pending = members
+    .filter(
+      (m) =>
+        m.status === "alive" &&
+        (m.note === "pending" || m.note === "no pick yet")
+    )
+    .sort(byName);
+  const eliminatedThisWeek = members
+    .filter((m) => m.status === "alive" && m.provisional === "eliminated")
+    .sort(byName);
+  const previouslyEliminated = members
+    .filter((m) => m.status !== "alive")
+    .sort(byName);
 
   const renderPick = (m: Member) =>
     m.pickedTeam ? (
-      <span className="flex items-center gap-1 text-xs text-pl-purple/60">
+      <span className="flex items-center gap-1 text-xs text-pl-purple/60 shrink-0">
         {m.pickedTeam.crest_url && (
-          <img src={m.pickedTeam.crest_url} alt="" className="h-3 w-3 object-contain" />
+          <img
+            src={m.pickedTeam.crest_url}
+            alt=""
+            className="h-3 w-3 object-contain"
+          />
         )}
         {m.pickedTeam.short_name}
       </span>
     ) : null;
 
+  const Row = ({
+    m,
+    tone,
+  }: {
+    m: Member;
+    tone: "safe" | "pending" | "out";
+  }) => {
+    const nameClass =
+      tone === "safe"
+        ? "text-pl-purple font-medium"
+        : tone === "pending"
+        ? "text-pl-purple"
+        : "text-pl-purple/70 line-through";
+    const dot =
+      tone === "safe"
+        ? "bg-pl-accent"
+        : tone === "pending"
+        ? "bg-yellow-400"
+        : "bg-red-500/70";
+    const noteText =
+      tone === "out"
+        ? m.note
+          ? m.note
+          : `GW ${m.eliminated_gameweek ?? "?"}`
+        : m.note;
+    return (
+      <li className="flex items-center justify-between gap-2">
+        <span className="flex items-center gap-2 min-w-0">
+          <span className={"h-2 w-2 rounded-full shrink-0 " + dot} />
+          <span className={"truncate " + nameClass}>
+            {m.profile?.username ?? "Player"}
+          </span>
+          {renderPick(m)}
+        </span>
+        {noteText && (
+          <span className="text-xs text-pl-purple/50 shrink-0">{noteText}</span>
+        )}
+      </li>
+    );
+  };
+
+  const Section = ({
+    title,
+    count,
+    items,
+    tone,
+  }: {
+    title: string;
+    count: number;
+    items: Member[];
+    tone: "safe" | "pending" | "out";
+  }) =>
+    items.length > 0 ? (
+      <div className="mt-4 first:mt-0">
+        <h3 className="text-xs uppercase tracking-wider text-pl-purple/50">
+          {title} ({count})
+        </h3>
+        <ul className="mt-1 space-y-1 text-sm">
+          {items.map((m) => (
+            <Row key={m.user_id} m={m} tone={tone} />
+          ))}
+        </ul>
+      </div>
+    ) : null;
+
   return (
     <aside className="card h-fit">
       <h2 className="text-lg font-semibold">Players</h2>
-      <div className="mt-3">
-        <h3 className="text-xs uppercase tracking-wider text-pl-purple/50">
-          Alive ({alive.length})
-        </h3>
-        <ul className="mt-1 space-y-1 text-sm">
-          {alive.map((m) => (
-            <li key={m.user_id} className="flex items-center justify-between gap-2">
-              <span className="flex items-center gap-2 min-w-0">
-                <span className={"h-2 w-2 rounded-full shrink-0 " + dotColor(m.note)} />
-                <span className="truncate">{m.profile?.username ?? "Player"}</span>
-                {renderPick(m)}
-              </span>
-              {m.note && (
-                <span className="text-xs text-pl-purple/50 shrink-0">{m.note}</span>
-              )}
-            </li>
-          ))}
-          {alive.length === 0 && <li className="text-pl-purple/40">No survivors.</li>}
-        </ul>
-      </div>
-      {dead.length > 0 && (
-        <div className="mt-4">
-          <h3 className="text-xs uppercase tracking-wider text-pl-purple/50">
-            Eliminated ({dead.length})
-          </h3>
-          <ul className="mt-1 space-y-1 text-sm text-pl-purple/60">
-            {dead.map((m) => (
-              <li key={m.user_id} className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2 min-w-0">
-                  <span className="line-through truncate">
-                    {m.profile?.username ?? "Player"}
-                  </span>
-                  {renderPick(m)}
-                </span>
-                <span className="text-xs shrink-0">
-                  {m.note ? m.note : `GW ${m.eliminated_gameweek ?? "?"}`}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <Section title="Advanced" count={safe.length} items={safe} tone="safe" />
+      <Section
+        title="Pending"
+        count={pending.length}
+        items={pending}
+        tone="pending"
+      />
+      <Section
+        title="Out this week"
+        count={eliminatedThisWeek.length}
+        items={eliminatedThisWeek}
+        tone="out"
+      />
+      <Section
+        title="Previously eliminated"
+        count={previouslyEliminated.length}
+        items={previouslyEliminated}
+        tone="out"
+      />
+      {safe.length === 0 &&
+        pending.length === 0 &&
+        eliminatedThisWeek.length === 0 &&
+        previouslyEliminated.length === 0 && (
+          <p className="mt-3 text-pl-purple/40 text-sm">No players yet.</p>
+        )}
     </aside>
   );
 }
