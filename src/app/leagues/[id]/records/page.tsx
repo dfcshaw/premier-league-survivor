@@ -6,12 +6,13 @@ const PAST_WINNERS = [
   { season: "23/24", winners: ["Aaron Schoenfeld", "Paul Garlick"] },
   { season: "24/25", winners: ["Justin Baker", "Dylan Castanheira"] },
   { season: "25/26", winners: ["Alex Don", "Simon Weis"] },
+  { season: "26/27", winners: ["Owen Wolfson"] },
 ];
 
 const RECORDS = [
   { label: "Biggest Prize", value: "$335", context: "25/26 Round 1" },
   { label: "Longest Run", value: "17 weeks", context: "25/26 Round 1" },
-  { label: "Shortest Run", value: "6 weeks", context: "24/25 Round 2" },
+  { label: "Shortest Run", value: "5 weeks", context: "26/27 Round 1" },
 ];
 
 export default async function RecordsPage({

@@ -8,4 +8,5 @@ export const CHAMPIONS: Record<string, string[]> = {
   // "dcastanheira": ["24/25"],
   "AlexDon": ["25/26"],
   "Simonweis": ["25/26"],
+  "owolfson1": ["26/27"]
 };
