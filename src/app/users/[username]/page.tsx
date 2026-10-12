@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CLUB_COLORS, DEFAULT_COLORS } from "@/lib/club-colors";
 import { CHAMPIONS } from "@/lib/champions";
+import BackButton from "@/components/BackButton";
 
 export default async function UserProfilePage({
   params,
@@ -28,9 +29,7 @@ export default async function UserProfilePage({
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between">
-        <Link href="/dashboard" className="text-sm text-pl-purple/60 hover:underline">
-          ← Back
-        </Link>
+        <BackButton />
         {isOwnProfile && (
           <Link href="/profile/edit" className="text-sm text-pl-accent-text hover:underline">
             Edit profile →

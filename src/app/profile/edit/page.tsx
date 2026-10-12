@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { updateUsername, updateEmail, updateFavoriteClub, requestPasswordReset } from "./actions";
+import BackButton from "@/components/BackButton";
 
 export default async function EditProfilePage({
   searchParams,
@@ -43,9 +44,7 @@ export default async function EditProfilePage({
   return (
     <section className="max-w-md mx-auto space-y-6">
       <header>
-        <Link href="/dashboard" className="text-sm text-pl-purple/60 hover:underline">
-          ← Back
-        </Link>
+        <BackButton />
         <h1 className="text-3xl font-bold mt-1">Edit your name</h1>
         <p className="text-pl-purple/60 text-sm mt-2">
           Use your real name — it helps everyone recognize who&apos;s who.
