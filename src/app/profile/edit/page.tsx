@@ -172,7 +172,7 @@ export default async function EditProfilePage({
 
       <form action={updateRushmore} className="card space-y-4">
         <div>
-          <h2 className="font-semibold">Mount Rushmore</h2>
+          <h2 className="font-semibold">Top 4</h2>
           <p className="text-xs text-pl-purple/60 mt-1">Pick 4 Premier League players — any era.</p>
         </div>
         {[1, 2, 3, 4].map((slot) => (

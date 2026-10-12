@@ -103,7 +103,7 @@ export default async function UserProfilePage({
 
       {rushmorePlayers.length > 0 && (
         <div className="card">
-          <h2 className="text-lg font-semibold">Mount Rushmore</h2>
+          <h2 className="text-lg font-semibold">Top 4</h2>
           <p className="text-xs text-pl-purple/60 mt-1">Click a card to flip for PL stats.</p>
           <div className="mt-4 grid grid-cols-4 gap-3">
             {rushmorePlayers.map((p: any) => (
