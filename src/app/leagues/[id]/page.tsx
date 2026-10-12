@@ -26,7 +26,7 @@ export default async function LeaguePage({
 
   const { data: me } = await supabase
     .from("league_members")
-    .select("status, eliminated_gameweek")
+    .select("status, eliminated_gameweek, has_paid")
     .eq("league_id", league.id)
     .eq("user_id", user.id)
     .maybeSingle();
