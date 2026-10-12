@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CLUB_COLORS, DEFAULT_COLORS } from "@/lib/club-colors";
 import { CHAMPIONS } from "@/lib/champions";
-import BackButton from "@/components/BackButton";
 import { PL_PLAYERS } from "@/lib/pl-players";
+import BackButton from "@/components/BackButton";
 
 export default async function UserProfilePage({
   params,
@@ -26,7 +26,8 @@ export default async function UserProfilePage({
   const colors = (clubName && CLUB_COLORS[clubName]) || DEFAULT_COLORS;
   const isChampion = CHAMPIONS[profile.username];
   const isOwnProfile = user?.id === profile.id;
-    const { data: rushmore } = await supabase
+
+  const { data: rushmore } = await supabase
     .from("profile_rushmore")
     .select("slot, player_id")
     .eq("user_id", profile.id)
@@ -36,6 +37,7 @@ export default async function UserProfilePage({
   const rushmorePlayers = (rushmore ?? [])
     .map((r: any) => playersById.get(r.player_id))
     .filter(Boolean);
+
   const initials = (name: string) =>
     name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
@@ -84,42 +86,43 @@ export default async function UserProfilePage({
         </div>
       </div>
 
-      {!clubName && (
-        <div className="card">
-          <p className="text-pl-purple/60 text-sm">
-            This user hasn&apos;t picked a favorite club yet.
-          </p>
-        </div>
-      )}
-          {rushmorePlayers.length > 0 && (
+      {rushmorePlayers.length > 0 && (
         <div className="card">
           <h2 className="text-lg font-semibold">Mount Rushmore</h2>
-          <div className="mt-4 grid grid-cols-4 gap-3">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {rushmorePlayers.map((p: any) => (
               <div key={p.id} className="text-center">
                 {p.image_url ? (
                   <img
                     src={p.image_url}
                     alt={p.name}
-                    className="w-full aspect-square rounded-md object-cover"
+                    className="w-full aspect-[4/3] rounded-md object-cover object-top bg-pl-purple/5"
                   />
                 ) : (
                   <div
-                    className="w-full aspect-square rounded-md flex items-center justify-center text-xl font-bold"
+                    className="w-full aspect-[4/3] rounded-md flex items-center justify-center text-3xl font-bold"
                     style={{ background: colors.primary, color: colors.text }}
                   >
                     {initials(p.name)}
                   </div>
                 )}
-                <div className="mt-2 text-xs text-pl-purple font-medium">
+                <div className="mt-2 text-sm text-pl-purple font-medium">
                   {p.name}
                 </div>
                 {p.club && (
-                  <div className="text-[10px] text-pl-purple/60">{p.club}</div>
+                  <div className="text-xs text-pl-purple/60">{p.club}</div>
                 )}
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {!clubName && (
+        <div className="card">
+          <p className="text-pl-purple/60 text-sm">
+            This user hasn&apos;t picked a favorite club yet.
+          </p>
         </div>
       )}
     </section>
