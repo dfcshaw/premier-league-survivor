@@ -35,6 +35,7 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/signup") ||
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/users/") ||
     pathname.startsWith("/auth/");
 
   if (!user && !isPublic) {

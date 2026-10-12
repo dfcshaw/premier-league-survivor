@@ -1,4 +1,5 @@
 import { CHAMPIONS } from "@/lib/champions";
+import Link from "next/link";
 type Member = {
   user_id: string;
   status: "alive" | "eliminated" | string;
@@ -74,9 +75,16 @@ export default function MembersTable({ members }: { members: Member[] }) {
       <li className="flex items-center justify-between gap-2">
         <span className="flex items-center gap-2 min-w-0">
           <span className={"h-2 w-2 rounded-full shrink-0 " + dot} />
-          <span className={"truncate " + nameClass}>
-  {m.profile?.username ?? "Player"}
-</span>
+                {m.profile?.username ? (
+        <Link
+          href={`/users/${encodeURIComponent(m.profile.username)}`}
+          className={"truncate hover:underline " + nameClass}
+        >
+          {m.profile.username}
+        </Link>
+      ) : (
+        <span className={"truncate " + nameClass}>Player</span>
+      )}
 {m.profile?.username && CHAMPIONS[m.profile.username] && (
   <span
     title={`Champion ${CHAMPIONS[m.profile.username].join(", ")}`}

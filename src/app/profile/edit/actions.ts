@@ -43,3 +43,21 @@ export async function updateEmail(formData: FormData) {
 
   redirect("/profile/edit?message=Check%20your%20new%20email%20to%20confirm%20the%20change");
 }
+export async function updateFavoriteClub(formData: FormData) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const clubIdRaw = String(formData.get("favorite_club_id") ?? "");
+  const favorite_club_id = clubIdRaw === "" ? null : Number(clubIdRaw);
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ favorite_club_id })
+    .eq("id", user.id);
+
+  if (error) {
+    redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
+  }
+  redirect("/profile/edit?message=Favorite%20club%20updated");
+}

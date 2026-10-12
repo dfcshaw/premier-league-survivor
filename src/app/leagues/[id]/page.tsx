@@ -38,9 +38,10 @@ export default async function LeaguePage({
     .eq("league_id", league.id)
     .order("status", { ascending: true });
 
-  const { data: teams } = await supabase
+    const { data: teams } = await supabase
     .from("teams")
     .select("id, name, short_name, crest_url")
+    .eq("tier", "PL")
     .order("name");
 
   const { data: myPicks } = await supabase

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { updateUsername, updateEmail } from "./actions";
+import { updateUsername, updateEmail, updateFavoriteClub } from "./actions";
 
 export default async function EditProfilePage({
   searchParams,
@@ -19,6 +19,26 @@ export default async function EditProfilePage({
     .maybeSingle();
 
   const emailConfirmed = !!user.email_confirmed_at;
+
+  const { data: allClubs } = await supabase
+    .from("teams")
+    .select("id, name, tier")
+    .order("tier")
+    .order("name");
+
+  const { data: fullProfile } = await supabase
+    .from("profiles")
+    .select("favorite_club_id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const clubsByTier: Record<string, any[]> = {};
+  (allClubs ?? []).forEach((c: any) => {
+    const t = c.tier || "Other";
+    if (!clubsByTier[t]) clubsByTier[t] = [];
+    clubsByTier[t].push(c);
+  });
+  const tierOrder = ["PL", "EFL"];
 
   return (
     <section className="max-w-md mx-auto space-y-6">
@@ -86,6 +106,32 @@ export default async function EditProfilePage({
         <button className="btn" type="submit">
           Update email
         </button>
+      </form>
+      <form action={updateFavoriteClub} className="card space-y-4">
+        <div>
+          <label className="label" htmlFor="favorite_club_id">Favorite club</label>
+          <select
+            id="favorite_club_id"
+            name="favorite_club_id"
+            className="input"
+            defaultValue={fullProfile?.favorite_club_id ?? ""}
+          >
+            <option value="">— none —</option>
+            {tierOrder.map((tier) =>
+              clubsByTier[tier] ? (
+                <optgroup key={tier} label={tier}>
+                  {clubsByTier[tier].map((c: any) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </optgroup>
+              ) : null
+            )}
+          </select>
+          <p className="mt-2 text-xs text-pl-purple/60">
+            Your public profile page will use this club&apos;s colors.
+          </p>
+        </div>
+        <button className="btn" type="submit">Save club</button>
       </form>
     </section>
   );
