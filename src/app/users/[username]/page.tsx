@@ -89,18 +89,18 @@ export default async function UserProfilePage({
       {rushmorePlayers.length > 0 && (
         <div className="card">
           <h2 className="text-lg font-semibold">Mount Rushmore</h2>
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="mt-4 grid grid-cols-4 gap-3">
             {rushmorePlayers.map((p: any) => (
               <div key={p.id} className="text-center">
                 {p.image_url ? (
                   <img
                     src={p.image_url}
                     alt={p.name}
-                    className="w-full aspect-[4/3] rounded-md object-cover object-top bg-pl-purple/5"
+                    className="w-full aspect-[2/3] rounded-md object-cover object-top bg-pl-purple/5"
                   />
                 ) : (
                   <div
-                    className="w-full aspect-[4/3] rounded-md flex items-center justify-center text-3xl font-bold"
+                    className="w-full aspect-[2/3] rounded-md flex items-center justify-center text-3xl font-bold"
                     style={{ background: colors.primary, color: colors.text }}
                   >
                     {initials(p.name)}
