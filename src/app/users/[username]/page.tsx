@@ -10,6 +10,7 @@ export default async function UserProfilePage({
   params: { username: string };
 }) {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -22,12 +23,20 @@ export default async function UserProfilePage({
   const tier = (profile as any).team?.tier;
   const colors = (clubName && CLUB_COLORS[clubName]) || DEFAULT_COLORS;
   const isChampion = CHAMPIONS[profile.username];
+  const isOwnProfile = user?.id === profile.id;
 
   return (
     <section className="space-y-6">
-      <Link href="/dashboard" className="text-sm text-pl-purple/60 hover:underline">
-        ← Back
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link href="/dashboard" className="text-sm text-pl-purple/60 hover:underline">
+          ← Back
+        </Link>
+        {isOwnProfile && (
+          <Link href="/profile/edit" className="text-sm text-pl-accent-text hover:underline">
+            Edit profile →
+          </Link>
+        )}
+      </div>
 
       <div
         className="rounded-xl p-8 shadow-sm"
