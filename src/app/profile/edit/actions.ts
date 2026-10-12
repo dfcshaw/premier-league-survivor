@@ -76,3 +76,29 @@ export async function requestPasswordReset() {
   }
   redirect("/profile/edit?message=Check%20your%20email%20for%20a%20password%20reset%20link");
 }
+export async function updateRushmore(formData: FormData) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const picks = [1, 2, 3, 4].map((slot) => {
+    const id = String(formData.get(`slot_${slot}`) ?? "").trim();
+    return { slot, player_id: id };
+  });
+
+  // Clear and reinsert
+  await supabase.from("profile_rushmore").delete().eq("user_id", user.id);
+
+  const rows = picks
+    .filter((p) => p.player_id)
+    .map((p) => ({ user_id: user.id, slot: p.slot, player_id: p.player_id }));
+
+  if (rows.length) {
+    const { error } = await supabase.from("profile_rushmore").insert(rows);
+    if (error) {
+      redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
+    }
+  }
+
+  redirect("/profile/edit?message=Mount%20Rushmore%20updated");
+}

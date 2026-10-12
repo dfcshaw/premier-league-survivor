@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { updateUsername, updateEmail, updateFavoriteClub, requestPasswordReset } from "./actions";
+import { updateUsername, updateEmail, updateFavoriteClub, requestPasswordReset, updateRushmore } from "./actions";
+import { PL_PLAYERS } from "@/lib/pl-players";
 import BackButton from "@/components/BackButton";
 
 export default async function EditProfilePage({
@@ -40,6 +41,14 @@ export default async function EditProfilePage({
     clubsByTier[t].push(c);
   });
   const tierOrder = ["PL", "EFL"];
+
+  const { data: rushmore } = await supabase
+    .from("profile_rushmore")
+    .select("slot, player_id")
+    .eq("user_id", user.id)
+    .order("slot");
+  const rushmoreBySlot = new Map<number, string>();
+  (rushmore ?? []).forEach((r: any) => rushmoreBySlot.set(r.slot, r.player_id));
 
   return (
     <section className="max-w-md mx-auto space-y-6">
@@ -140,6 +149,33 @@ export default async function EditProfilePage({
         <button className="btn-ghost" type="submit">
           Reset password
         </button>
+      </form>
+      <form action={updateRushmore} className="card space-y-4">
+        <div>
+          <h2 className="font-semibold">Mount Rushmore</h2>
+          <p className="text-xs text-pl-purple/60 mt-1">
+            Pick 4 Premier League players — any era. They&apos;ll show on your profile.
+          </p>
+        </div>
+        {[1, 2, 3, 4].map((slot) => (
+          <div key={slot}>
+            <label className="label" htmlFor={`slot_${slot}`}>Slot {slot}</label>
+            <select
+              id={`slot_${slot}`}
+              name={`slot_${slot}`}
+              className="input"
+              defaultValue={rushmoreBySlot.get(slot) ?? ""}
+            >
+              <option value="">— none —</option>
+              {PL_PLAYERS.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}{p.club ? ` (${p.club})` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+        ))}
+        <button className="btn" type="submit">Save Rushmore</button>
       </form>
     </section>
   );
