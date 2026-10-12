@@ -197,6 +197,18 @@ export default async function LeaguePage({
   </p>
 ) : league.status === "completed" ? (
   <p className="mt-2 text-pl-purple/70 text-sm">This league has finished.</p>
+) : !user.email_confirmed_at ? (
+  <div className="mt-2 text-sm space-y-2">
+    <p className="text-pl-purple/70">
+      Please verify your email before picking. If you entered the wrong address, you can change it below.
+    </p>
+    <Link
+      href={`/profile/edit?redirect_to=/leagues/${league.id}`}
+      className="btn-ghost inline-block"
+    >
+      Update email →
+    </Link>
+  </div>
 ) : !myProfile?.name_confirmed ? (
   <div className="mt-2 text-sm">
     <p className="text-pl-purple/70">

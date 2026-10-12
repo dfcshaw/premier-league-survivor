@@ -2,11 +2,12 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { updateUsername } from "./actions";
+import { updateUsername, updateEmail } from "./actions";
 
 export default async function EditProfilePage({
   searchParams,
 }: {
-  searchParams: { error?: string; redirect_to?: string };
+  searchParams: { error?: string; message?: string; redirect_to?: string };
 }) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -17,6 +18,8 @@ export default async function EditProfilePage({
     .select("username, name_confirmed")
     .eq("id", user.id)
     .maybeSingle();
+
+  const emailConfirmed = !!user.email_confirmed_at;
 
   return (
     <section className="max-w-md mx-auto space-y-6">
@@ -33,6 +36,11 @@ export default async function EditProfilePage({
       {searchParams.error && (
         <div className="card border-red-500/40 text-red-700 text-sm">
           {searchParams.error}
+        </div>
+      )}
+      {searchParams.message && (
+        <div className="card border-pl-accent/40 text-pl-accent-text text-sm">
+          {searchParams.message}
         </div>
       )}
 
@@ -55,6 +63,30 @@ export default async function EditProfilePage({
           />
         </div>
         <button className="btn" type="submit">Save</button>
+      </form>
+            <form action={updateEmail} className="card space-y-4">
+        <div>
+          <label className="label" htmlFor="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            className="input"
+            defaultValue={user.email ?? ""}
+            required
+          />
+          <p className="mt-2 text-xs text-pl-purple/60">
+            Status:{" "}
+            {emailConfirmed ? (
+              <span className="text-pl-accent-text">verified ✓</span>
+            ) : (
+              <span className="text-red-700">not verified — picks blocked</span>
+            )}
+          </p>
+        </div>
+        <button className="btn" type="submit">
+          Update email
+        </button>
       </form>
     </section>
   );

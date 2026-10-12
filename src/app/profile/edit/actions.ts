@@ -26,3 +26,20 @@ export async function updateUsername(formData: FormData) {
   const redirectTo = String(formData.get("redirect_to") ?? "/dashboard");
   redirect(redirectTo);
 }
+export async function updateEmail(formData: FormData) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const newEmail = String(formData.get("email") ?? "").trim();
+  if (!newEmail.includes("@") || newEmail.length < 5) {
+    redirect("/profile/edit?error=Invalid%20email");
+  }
+
+  const { error } = await supabase.auth.updateUser({ email: newEmail });
+  if (error) {
+    redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
+  }
+
+  redirect("/profile/edit?message=Check%20your%20new%20email%20to%20confirm%20the%20change");
+}

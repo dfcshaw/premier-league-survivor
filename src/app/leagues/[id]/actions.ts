@@ -42,6 +42,10 @@ export async function makePick(formData: FormData) {
   if (!member.has_paid) {
     redirect(`/leagues/${leagueId}?error=You%20haven%27t%20paid%20yet%20—%20see%20the%20commissioner`);
   }
+    // Email verification check
+  if (!user.email_confirmed_at) {
+    redirect(`/leagues/${leagueId}?error=Please%20verify%20your%20email%20first`);
+  }
 
   // Kickoff check on the team being picked
   const { data: fixture } = await supabase
