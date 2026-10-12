@@ -27,6 +27,11 @@ export default function LoginPage({
       <p className="mt-4 text-sm text-pl-purple/60">
         No account? <Link className="text-pl-accent-text" href="/signup">Sign up</Link>
       </p>
+      <p className="text-sm text-pl-purple/60 mt-2">
+  <Link href="/forgot-password" className="hover:underline">
+    Forgot password?
+  </Link>
+</p>
     </section>
   );
 }
