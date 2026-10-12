@@ -210,9 +210,22 @@ export default async function LeaguePage({
     </Link>
   </div>
 ) : !(me as any).has_paid ? (
-  <p className="mt-2 text-pl-purple/70 text-sm">
-    Pay the commissioner to unlock picks for this round.
-  </p>
+  <div className="mt-2 text-sm space-y-3">
+    <p className="text-pl-purple/70">
+      Pay the commissioner $5 to unlock your picks for this round.
+    </p>
+    <a
+      href="https://venmo.com/u/Daniel-Shaw-96"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="btn inline-block"
+    >
+      Pay $5 via Venmo →
+    </a>
+    <p className="text-xs text-pl-purple/50">
+      Include &quot;Survivor Pool&quot; in the note. Once Daniel receives it, you&apos;ll be marked paid.
+    </p>
+  </div>
 ) : (
   <PickForm
     leagueId={league.id}
