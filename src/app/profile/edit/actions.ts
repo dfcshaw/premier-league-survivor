@@ -2,6 +2,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 export async function updateUsername(formData: FormData) {
   const supabase = createClient();
@@ -60,4 +61,18 @@ export async function updateFavoriteClub(formData: FormData) {
     redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
   }
   redirect("/profile/edit?message=Favorite%20club%20updated");
+}
+export async function requestPasswordReset() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) redirect("/login");
+
+  const origin = headers().get("origin") ?? "";
+  const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+  });
+  if (error) {
+    redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
+  }
+  redirect("/profile/edit?message=Check%20your%20email%20for%20a%20password%20reset%20link");
 }

@@ -2,7 +2,7 @@ import "./globals.css";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import SignOutButton from "@/components/SignOutButton";
+import UserMenu from "@/components/UserMenu";
 
 export const metadata: Metadata = {
   title: "PL Survivor",
@@ -15,9 +15,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let username: string | null = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", user.id)
+      .maybeSingle();
+    username = profile?.username ?? null;
+  }
 
   return (
     <html lang="en">
@@ -33,10 +41,7 @@ export default async function RootLayout({
                   <Link href="/dashboard" className="text-white hover:underline">
                     Dashboard
                   </Link>
-                  <Link href="/profile/edit" className="text-white hover:underline">
-                    Edit profile
-                  </Link>
-                  <SignOutButton />
+                  <UserMenu username={username} />
                 </>
               ) : (
                 <>

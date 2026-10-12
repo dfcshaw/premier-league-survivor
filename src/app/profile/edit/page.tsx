@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { updateUsername, updateEmail, updateFavoriteClub } from "./actions";
+import { updateUsername, updateEmail, updateFavoriteClub, requestPasswordReset } from "./actions";
 
 export default async function EditProfilePage({
   searchParams,
@@ -132,6 +132,15 @@ export default async function EditProfilePage({
           </p>
         </div>
         <button className="btn" type="submit">Save club</button>
+      </form>
+      <form action={requestPasswordReset} className="card space-y-2">
+        <h2 className="font-semibold">Password</h2>
+        <p className="text-xs text-pl-purple/60">
+          We&apos;ll email you a reset link.
+        </p>
+        <button className="btn-ghost" type="submit">
+          Reset password
+        </button>
       </form>
     </section>
   );
