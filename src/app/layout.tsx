@@ -30,17 +30,17 @@ export default async function RootLayout({
             <nav className="flex items-center gap-3 text-sm">
               {user ? (
                 <>
-                                    <Link href="/dashboard" className="hover:underline">
+                  <Link href="/dashboard" className="text-white hover:underline">
                     Dashboard
                   </Link>
-                  <Link href="/profile/edit" className="hover:underline">
+                  <Link href="/profile/edit" className="text-white hover:underline">
                     Edit profile
                   </Link>
                   <SignOutButton />
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="hover:underline">
+                  <Link href="/login" className="text-white hover:underline">
                     Log in
                   </Link>
                   <Link href="/signup" className="btn !py-1.5">
