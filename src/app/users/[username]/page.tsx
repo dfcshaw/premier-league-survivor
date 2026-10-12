@@ -17,7 +17,7 @@ export default async function UserProfilePage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, username, favorite_club_id, team:favorite_club_id(name, short_name, crest_url, tier)")
+    .select("id, username, avatar_url, favorite_club_id, team:favorite_club_id(name, short_name, crest_url, tier)")
     .eq("username", decodeURIComponent(params.username))
     .maybeSingle();
   if (!profile) notFound();
@@ -39,6 +39,8 @@ export default async function UserProfilePage({
     .map((r: any) => playersById.get(r.player_id))
     .filter(Boolean);
 
+  const initials = profile.username?.[0]?.toUpperCase() ?? "?";
+
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between">
@@ -55,12 +57,20 @@ export default async function UserProfilePage({
         style={{ background: colors.primary, color: colors.text }}
       >
         <div className="flex items-center gap-4">
-          {(profile as any).team?.crest_url && (
+          {profile.avatar_url ? (
             <img
-              src={(profile as any).team.crest_url}
+              src={profile.avatar_url}
               alt=""
-              className="h-12 w-12 object-contain"
+              className="h-20 w-20 rounded-full object-cover border-2"
+              style={{ borderColor: colors.accent }}
             />
+          ) : (
+            <div
+              className="h-20 w-20 rounded-full flex items-center justify-center text-2xl font-bold border-2"
+              style={{ borderColor: colors.accent, background: "rgba(255,255,255,0.1)" }}
+            >
+              {initials}
+            </div>
           )}
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
@@ -79,6 +89,13 @@ export default async function UserProfilePage({
               <p className="text-sm opacity-80">
                 Supports {clubName}{tier && tier !== "PL" ? ` (${tier})` : ""}
               </p>
+            )}
+            {(profile as any).team?.crest_url && (
+              <img
+                src={(profile as any).team.crest_url}
+                alt=""
+                className="h-6 w-6 object-contain mt-2"
+              />
             )}
           </div>
         </div>

@@ -102,3 +102,41 @@ export async function updateRushmore(formData: FormData) {
 
   redirect("/profile/edit?message=Mount%20Rushmore%20updated");
 }
+export async function uploadAvatar(formData: FormData) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const file = formData.get("avatar") as File | null;
+  if (!file || file.size === 0) {
+    redirect("/profile/edit?error=No%20file%20selected");
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    redirect("/profile/edit?error=File%20must%20be%20under%202MB");
+  }
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    redirect("/profile/edit?error=Only%20JPG%2C%20PNG%2C%20or%20WebP");
+  }
+
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${user.id}/${Date.now()}.${ext}`;
+
+  const { error: upErr } = await supabase.storage
+    .from("avatars")
+    .upload(path, file, { upsert: true, contentType: file.type });
+  if (upErr) {
+    redirect(`/profile/edit?error=${encodeURIComponent(upErr.message)}`);
+  }
+
+  const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+
+  const { error: updErr } = await supabase
+    .from("profiles")
+    .update({ avatar_url: pub.publicUrl })
+    .eq("id", user.id);
+  if (updErr) {
+    redirect(`/profile/edit?error=${encodeURIComponent(updErr.message)}`);
+  }
+
+  redirect("/profile/edit?message=Photo%20updated");
+}

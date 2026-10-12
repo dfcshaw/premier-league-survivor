@@ -1,9 +1,15 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { updateUsername, updateEmail, updateFavoriteClub, requestPasswordReset, updateRushmore } from "./actions";
-import { PL_PLAYERS } from "@/lib/pl-players";
 import BackButton from "@/components/BackButton";
+import { PL_PLAYERS } from "@/lib/pl-players";
+import {
+  updateUsername,
+  updateEmail,
+  updateFavoriteClub,
+  requestPasswordReset,
+  updateRushmore,
+  uploadAvatar,
+} from "./actions";
 
 export default async function EditProfilePage({
   searchParams,
@@ -16,23 +22,15 @@ export default async function EditProfilePage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("username, name_confirmed")
+    .select("username, avatar_url, favorite_club_id")
     .eq("id", user.id)
     .maybeSingle();
-
-  const emailConfirmed = !!user.email_confirmed_at;
 
   const { data: allClubs } = await supabase
     .from("teams")
     .select("id, name, tier")
     .order("tier")
     .order("name");
-
-  const { data: fullProfile } = await supabase
-    .from("profiles")
-    .select("favorite_club_id")
-    .eq("id", user.id)
-    .maybeSingle();
 
   const clubsByTier: Record<string, any[]> = {};
   (allClubs ?? []).forEach((c: any) => {
@@ -50,14 +48,13 @@ export default async function EditProfilePage({
   const rushmoreBySlot = new Map<number, string>();
   (rushmore ?? []).forEach((r: any) => rushmoreBySlot.set(r.slot, r.player_id));
 
+  const emailConfirmed = !!user.email_confirmed_at;
+
   return (
     <section className="max-w-md mx-auto space-y-6">
       <header>
         <BackButton />
-        <h1 className="text-3xl font-bold mt-1">Edit your name</h1>
-        <p className="text-pl-purple/60 text-sm mt-2">
-          Use your real name — it helps everyone recognize who&apos;s who.
-        </p>
+        <h1 className="text-3xl font-bold mt-1">Edit your profile</h1>
       </header>
 
       {searchParams.error && (
@@ -71,12 +68,37 @@ export default async function EditProfilePage({
         </div>
       )}
 
+      <form action={uploadAvatar} className="card space-y-4" encType="multipart/form-data">
+        <div className="flex items-center gap-4">
+          {profile?.avatar_url ? (
+            <img
+              src={profile.avatar_url}
+              alt=""
+              className="h-20 w-20 rounded-full object-cover border border-pl-purple/10"
+            />
+          ) : (
+            <div className="h-20 w-20 rounded-full bg-pl-purple/10 flex items-center justify-center text-xl font-bold text-pl-purple">
+              {profile?.username?.[0]?.toUpperCase() ?? "?"}
+            </div>
+          )}
+          <div className="flex-1">
+            <label className="label" htmlFor="avatar">Profile photo</label>
+            <input
+              id="avatar"
+              name="avatar"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="block text-sm"
+              required
+            />
+            <p className="text-xs text-pl-purple/60 mt-1">Max 2MB, JPG/PNG/WebP.</p>
+          </div>
+        </div>
+        <button className="btn" type="submit">Upload photo</button>
+      </form>
+
       <form action={updateUsername} className="card space-y-4">
-        <input
-          type="hidden"
-          name="redirect_to"
-          value={searchParams.redirect_to ?? "/dashboard"}
-        />
+        <input type="hidden" name="redirect_to" value={searchParams.redirect_to ?? "/dashboard"} />
         <div>
           <label className="label" htmlFor="username">Full name</label>
           <input
@@ -89,9 +111,10 @@ export default async function EditProfilePage({
             minLength={2}
           />
         </div>
-        <button className="btn" type="submit">Save</button>
+        <button className="btn" type="submit">Save name</button>
       </form>
-            <form action={updateEmail} className="card space-y-4">
+
+      <form action={updateEmail} className="card space-y-4">
         <div>
           <label className="label" htmlFor="email">Email</label>
           <input
@@ -111,10 +134,9 @@ export default async function EditProfilePage({
             )}
           </p>
         </div>
-        <button className="btn" type="submit">
-          Update email
-        </button>
+        <button className="btn" type="submit">Update email</button>
       </form>
+
       <form action={updateFavoriteClub} className="card space-y-4">
         <div>
           <label className="label" htmlFor="favorite_club_id">Favorite club</label>
@@ -122,7 +144,7 @@ export default async function EditProfilePage({
             id="favorite_club_id"
             name="favorite_club_id"
             className="input"
-            defaultValue={fullProfile?.favorite_club_id ?? ""}
+            defaultValue={profile?.favorite_club_id ?? ""}
           >
             <option value="">— none —</option>
             {tierOrder.map((tier) =>
@@ -141,21 +163,17 @@ export default async function EditProfilePage({
         </div>
         <button className="btn" type="submit">Save club</button>
       </form>
+
       <form action={requestPasswordReset} className="card space-y-2">
         <h2 className="font-semibold">Password</h2>
-        <p className="text-xs text-pl-purple/60">
-          We&apos;ll email you a reset link.
-        </p>
-        <button className="btn-ghost" type="submit">
-          Reset password
-        </button>
+        <p className="text-xs text-pl-purple/60">We&apos;ll email you a reset link.</p>
+        <button className="btn-ghost" type="submit">Reset password</button>
       </form>
+
       <form action={updateRushmore} className="card space-y-4">
         <div>
           <h2 className="font-semibold">Mount Rushmore</h2>
-          <p className="text-xs text-pl-purple/60 mt-1">
-            Pick 4 Premier League players — any era. They&apos;ll show on your profile.
-          </p>
+          <p className="text-xs text-pl-purple/60 mt-1">Pick 4 Premier League players — any era.</p>
         </div>
         {[1, 2, 3, 4].map((slot) => (
           <div key={slot}>
