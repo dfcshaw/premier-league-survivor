@@ -79,8 +79,24 @@ export default async function LeaguePage({
     .eq("league_id", league.id)
     .eq("gameweek", league.current_gameweek);
 
+
+  const { data: myProfile } = await supabase
+    .from("profiles")
+    .select("name_confirmed")
+    .eq("id", user.id)
+    .maybeSingle();
+  const myPayment = me as any; // Already fetched; see note below
+
+  const { data: me } = await supabase
+    .from("league_members")
+    .select("status, eliminated_gameweek, has_paid")
+    .eq("league_id", league.id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   const pickByUser = new Map<string, number>();
   (allCurrentPicks ?? []).forEach((p: any) => pickByUser.set(p.user_id, p.team_id));
+
 
   function resultForTeam(teamId: number): "win" | "draw" | "loss" | null {
     for (const f of (fixtures ?? []) as any[]) {
@@ -153,6 +169,14 @@ export default async function LeaguePage({
 <Link href={`/leagues/${league.id}/history`} className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4">
   Pick history →
 </Link>
+{isOwner && (
+  <Link
+    href={`/leagues/${league.id}/manage`}
+    className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4"
+  >
+    Manage payments →
+  </Link>
+)}
         </div>
         {isOwner && (
           <form action={`/api/leagues/${league.id}/advance`} method="post">
@@ -175,22 +199,38 @@ export default async function LeaguePage({
           <div className="card">
             <h2 className="text-lg font-semibold">GW {league.current_gameweek} pick</h2>
             {me.status !== "alive" ? (
-              <p className="mt-2 text-pl-purple/70 text-sm">
-                You were eliminated in GW {me.eliminated_gameweek ?? "?"}. You can still watch how the league unfolds.
-              </p>
-            ) : league.status === "completed" ? (
-              <p className="mt-2 text-pl-purple/70 text-sm">This league has finished.</p>
-            ) : (
-              <PickForm
-                leagueId={league.id}
-                gameweek={league.current_gameweek}
-                teams={teams ?? []}
-                usedTeamIds={[...usedTeamIds]}
-                lockedTeamIds={lockedTeamIds}
-                currentPickTeamId={myCurrentPick?.team_id ?? null}
-                currentPickLocked={currentPickLocked}
-              />
-            )}
+  <p className="mt-2 text-pl-purple/70 text-sm">
+    You were eliminated in GW {me.eliminated_gameweek ?? "?"}. You can still watch how the league unfolds.
+  </p>
+) : league.status === "completed" ? (
+  <p className="mt-2 text-pl-purple/70 text-sm">This league has finished.</p>
+) : !myProfile?.name_confirmed ? (
+  <div className="mt-2 text-sm">
+    <p className="text-pl-purple/70">
+      Please update your username to your real name before picking.
+    </p>
+    <Link
+      href={`/profile/edit?redirect_to=/leagues/${league.id}`}
+      className="inline-block mt-2 btn-ghost"
+    >
+      Update name →
+    </Link>
+  </div>
+) : !(me as any).has_paid ? (
+  <p className="mt-2 text-pl-purple/70 text-sm">
+    Pay the commissioner to unlock picks for this round.
+  </p>
+) : (
+  <PickForm
+    leagueId={league.id}
+    gameweek={league.current_gameweek}
+    teams={teams ?? []}
+    usedTeamIds={[...usedTeamIds]}
+    lockedTeamIds={lockedTeamIds}
+    currentPickTeamId={myCurrentPick?.team_id ?? null}
+    currentPickLocked={currentPickLocked}
+  />
+)}
           </div>
 
           {fixtures && fixtures.length > 0 && (

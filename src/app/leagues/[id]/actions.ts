@@ -85,3 +85,23 @@ export async function makePick(formData: FormData) {
   revalidatePath(`/leagues/${leagueId}`);
   redirect(`/leagues/${leagueId}?ok=1`);
 }
+  // Check profile name is confirmed
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("name_confirmed")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile?.name_confirmed) {
+    redirect(`/leagues/${leagueId}?error=Please%20update%20your%20name%20first`);
+  }
+
+  // Check payment
+  const { data: paidCheck } = await supabase
+    .from("league_members")
+    .select("has_paid")
+    .eq("league_id", leagueId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!paidCheck?.has_paid) {
+    redirect(`/leagues/${leagueId}?error=You%20haven%27t%20paid%20yet%20—%20see%20the%20commissioner`);
+  }
