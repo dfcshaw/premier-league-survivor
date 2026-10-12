@@ -85,14 +85,7 @@ export default async function LeaguePage({
     .select("name_confirmed")
     .eq("id", user.id)
     .maybeSingle();
-  const myPayment = me as any; // Already fetched; see note below
-
-  const { data: me } = await supabase
-    .from("league_members")
-    .select("status, eliminated_gameweek, has_paid")
-    .eq("league_id", league.id)
-    .eq("user_id", user.id)
-    .maybeSingle();
+  
 
   const pickByUser = new Map<string, number>();
   (allCurrentPicks ?? []).forEach((p: any) => pickByUser.set(p.user_id, p.team_id));
