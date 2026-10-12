@@ -5,6 +5,7 @@ import { CLUB_COLORS, DEFAULT_COLORS } from "@/lib/club-colors";
 import { CHAMPIONS } from "@/lib/champions";
 import { PL_PLAYERS } from "@/lib/pl-players";
 import BackButton from "@/components/BackButton";
+import RushmoreCard from "@/components/RushmoreCard";
 
 export default async function UserProfilePage({
   params,
@@ -37,9 +38,6 @@ export default async function UserProfilePage({
   const rushmorePlayers = (rushmore ?? [])
     .map((r: any) => playersById.get(r.player_id))
     .filter(Boolean);
-
-  const initials = (name: string) =>
-    name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
   return (
     <section className="space-y-6">
@@ -89,30 +87,10 @@ export default async function UserProfilePage({
       {rushmorePlayers.length > 0 && (
         <div className="card">
           <h2 className="text-lg font-semibold">Mount Rushmore</h2>
+          <p className="text-xs text-pl-purple/60 mt-1">Click a card to flip for PL stats.</p>
           <div className="mt-4 grid grid-cols-4 gap-3">
             {rushmorePlayers.map((p: any) => (
-              <div key={p.id} className="text-center">
-                {p.image_url ? (
-                  <img
-                    src={p.image_url}
-                    alt={p.name}
-                    className="w-full aspect-[2/3] rounded-md object-cover object-top bg-pl-purple/5"
-                  />
-                ) : (
-                  <div
-                    className="w-full aspect-[2/3] rounded-md flex items-center justify-center text-3xl font-bold"
-                    style={{ background: colors.primary, color: colors.text }}
-                  >
-                    {initials(p.name)}
-                  </div>
-                )}
-                <div className="mt-2 text-sm text-pl-purple font-medium">
-                  {p.name}
-                </div>
-                {p.club && (
-                  <div className="text-xs text-pl-purple/60">{p.club}</div>
-                )}
-              </div>
+              <RushmoreCard key={p.id} player={p} colors={colors} />
             ))}
           </div>
         </div>
