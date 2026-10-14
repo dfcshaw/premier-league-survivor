@@ -23,14 +23,6 @@ export default async function LeaguePage({
     .eq("id", params.id)
     .maybeSingle();
   if (!league) notFound();
-  const { count: paidCount } = await supabase
-    .from("league_members")
-    .select("user_id", { count: "exact", head: true })
-    .eq("league_id", league.id)
-    .eq("has_paid", true);
-
-  const buyIn = 5;
-  const pool = (paidCount ?? 0) * buyIn;
 
   const { data: me } = await supabase
     .from("league_members")
@@ -46,7 +38,7 @@ export default async function LeaguePage({
     .eq("league_id", league.id)
     .order("status", { ascending: true });
 
-      const { data: teams } = await supabase
+  const { data: teams } = await supabase
     .from("teams")
     .select("id, name, short_name, crest_url")
     .eq("tier", "PL")
@@ -69,6 +61,20 @@ export default async function LeaguePage({
     .eq("gameweek", league.current_gameweek)
     .order("kickoff");
 
+  const { count: paidCount } = await supabase
+    .from("league_members")
+    .select("user_id", { count: "exact", head: true })
+    .eq("league_id", league.id)
+    .eq("has_paid", true);
+  const buyIn = 5;
+  const pool = (paidCount ?? 0) * buyIn;
+
+  const { data: myProfile } = await supabase
+    .from("profiles")
+    .select("name_confirmed")
+    .eq("id", user.id)
+    .maybeSingle();
+
   const usedTeamIds = new Set((myPicks ?? []).map((p) => p.team_id));
   const myCurrentPick = (myPicks ?? []).find((p) => p.gameweek === league.current_gameweek);
   const isOwner = league.owner_id === user.id;
@@ -88,17 +94,8 @@ export default async function LeaguePage({
     .eq("league_id", league.id)
     .eq("gameweek", league.current_gameweek);
 
-
-  const { data: myProfile } = await supabase
-    .from("profiles")
-    .select("name_confirmed")
-    .eq("id", user.id)
-    .maybeSingle();
-  
-
   const pickByUser = new Map<string, number>();
   (allCurrentPicks ?? []).forEach((p: any) => pickByUser.set(p.user_id, p.team_id));
-
 
   function resultForTeam(teamId: number): "win" | "draw" | "loss" | null {
     for (const f of (fixtures ?? []) as any[]) {
@@ -123,14 +120,12 @@ export default async function LeaguePage({
   const teamById = new Map<number, any>();
   (teams ?? []).forEach((t: any) => teamById.set(t.id, t));
 
-    const provisionalMembers = (members ?? []).map((m: any) => {
+  const provisionalMembers = (members ?? []).map((m: any) => {
     const teamId = pickByUser.get(m.user_id);
     const kickedOff = teamId ? lockedTeamIds.includes(teamId) : false;
     const pickedTeam = kickedOff && teamId ? teamById.get(teamId) : null;
 
-    if (m.status !== "alive") {
-      return { ...m, provisional: "eliminated" as const, pickedTeam };
-    }
+    if (m.status !== "alive") return { ...m, provisional: "eliminated" as const, pickedTeam };
     if (!teamId) {
       return {
         ...m,
@@ -159,27 +154,23 @@ export default async function LeaguePage({
           <Link href="/dashboard" className="text-sm text-pl-purple/60 hover:underline">← All leagues</Link>
           <h1 className="text-3xl font-bold mt-1">{league.name}</h1>
           <p className="text-pl-purple/60 text-sm">
-  Gameweek <strong>{league.current_gameweek}</strong> · {provisionalAliveCount} still alive · pool{" "}
-  <strong className="text-pl-accent-text">${pool}</strong> · code{" "}
-  <code className="text-pl-accent-text">{league.code}</code>
-</p>
+            Gameweek <strong>{league.current_gameweek}</strong> · {provisionalAliveCount} still alive · code{" "}
+            <code className="text-pl-accent-text">{league.code}</code>
+          </p>
           <Link href={`/leagues/${league.id}/fixtures`} className="inline-block text-sm text-pl-accent-text hover:underline mt-2">
             View all fixtures →
           </Link>
           <Link href={`/leagues/${league.id}/records`} className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4">
             Pool history & records →
           </Link>
-<Link href={`/leagues/${league.id}/history`} className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4">
-  Pick history →
-</Link>
-{isOwner && (
-  <Link
-    href={`/leagues/${league.id}/manage`}
-    className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4"
-  >
-    Manage payments →
-  </Link>
-)}
+          <Link href={`/leagues/${league.id}/history`} className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4">
+            Pick history →
+          </Link>
+          {isOwner && (
+            <Link href={`/leagues/${league.id}/manage`} className="inline-block text-sm text-pl-accent-text hover:underline mt-2 ml-4">
+              Manage payments →
+            </Link>
+          )}
         </div>
         {isOwner && (
           <form action={`/api/leagues/${league.id}/advance`} method="post">
@@ -189,6 +180,16 @@ export default async function LeaguePage({
       </header>
 
       <KickoffRefresher kickoffs={(fixtures ?? []).map((f: any) => f.kickoff).filter(Boolean)} />
+
+      <div className="card flex items-center justify-between">
+        <div>
+          <div className="text-xs uppercase tracking-wider text-pl-purple/60">Current pool</div>
+          <div className="text-3xl font-bold text-pl-accent-text mt-1">${pool}</div>
+        </div>
+        <div className="text-right text-xs text-pl-purple/60">
+          {paidCount ?? 0} paid × ${buyIn}
+        </div>
+      </div>
 
       {searchParams.error && (
         <div className="card border-red-500/40 text-red-700 text-sm">{searchParams.error}</div>
@@ -202,63 +203,57 @@ export default async function LeaguePage({
           <div className="card">
             <h2 className="text-lg font-semibold">GW {league.current_gameweek} pick</h2>
             {me.status !== "alive" ? (
-  <p className="mt-2 text-pl-purple/70 text-sm">
-    You were eliminated in GW {me.eliminated_gameweek ?? "?"}. You can still watch how the league unfolds.
-  </p>
-) : league.status === "completed" ? (
-  <p className="mt-2 text-pl-purple/70 text-sm">This league has finished.</p>
-) : !user.email_confirmed_at ? (
-  <div className="mt-2 text-sm space-y-2">
-    <p className="text-pl-purple/70">
-      Please verify your email before picking. If you entered the wrong address, you can change it below.
-    </p>
-    <Link
-      href={`/profile/edit?redirect_to=/leagues/${league.id}`}
-      className="btn-ghost inline-block"
-    >
-      Update email →
-    </Link>
-  </div>
-) : !myProfile?.name_confirmed ? (
-  <div className="mt-2 text-sm">
-    <p className="text-pl-purple/70">
-      Please update your username to your real name before picking.
-    </p>
-    <Link
-      href={`/profile/edit?redirect_to=/leagues/${league.id}`}
-      className="inline-block mt-2 btn-ghost"
-    >
-      Update name →
-    </Link>
-  </div>
-) : !(me as any).has_paid ? (
-  <div className="mt-2 text-sm space-y-3">
-    <p className="text-pl-purple/70">
-      Pay the commissioner $5 to unlock your picks for this round.
-    </p>
-    <a
-      href="https://venmo.com/u/Daniel-Shaw-96"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="btn inline-block"
-    >
-      Pay $5 via Venmo →
-    </a>
-    <p className="text-xs text-pl-purple/50">
-      Include &quot;Survivor Pool&quot; in the note. Once Daniel receives it, you&apos;ll be marked paid.
-    </p>
-  </div>
-) : (
-  <PickForm
-    leagueId={league.id}
-    gameweek={league.current_gameweek}
-    teams={teams ?? []}
-    usedTeamIds={[...usedTeamIds]}
-    lockedTeamIds={lockedTeamIds}
-    currentPickTeamId={myCurrentPick?.team_id ?? null}
-    currentPickLocked={currentPickLocked}
-  />
-)}
+              <p className="mt-2 text-pl-purple/70 text-sm">
+                You were eliminated in GW {me.eliminated_gameweek ?? "?"}. You can still watch how the league unfolds.
+              </p>
+            ) : league.status === "completed" ? (
+              <p className="mt-2 text-pl-purple/70 text-sm">This league has finished.</p>
+            ) : !user.email_confirmed_at ? (
+              <div className="mt-2 text-sm space-y-2">
+                <p className="text-pl-purple/70">
+                  Please verify your email before picking. If you entered the wrong address, you can change it below.
+                </p>
+                <Link href={`/profile/edit?redirect_to=/leagues/${league.id}`} className="btn-ghost inline-block">
+                  Update email →
+                </Link>
+              </div>
+            ) : !myProfile?.name_confirmed ? (
+              <div className="mt-2 text-sm">
+                <p className="text-pl-purple/70">
+                  Please update your username to your real name before picking.
+                </p>
+                <Link href={`/profile/edit?redirect_to=/leagues/${league.id}`} className="inline-block mt-2 btn-ghost">
+                  Update name →
+                </Link>
+              </div>
+            ) : !(me as any).has_paid ? (
+              <div className="mt-2 text-sm space-y-3">
+                <p className="text-pl-purple/70">
+                  Pay the commissioner $5 to unlock your picks for this round.
+                </p>
+                <a
+                  href="https://venmo.com/u/Daniel-Shaw-96"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn inline-block"
+                >
+                  Pay $5 via Venmo →
+                </a>
+                <p className="text-xs text-pl-purple/50">
+                  Include &quot;Survivor Pool&quot; in the note. Once Daniel receives it, you&apos;ll be marked paid.
+                </p>
+              </div>
+            ) : (
+              <PickForm
+                leagueId={league.id}
+                gameweek={league.current_gameweek}
+                teams={teams ?? []}
+                usedTeamIds={[...usedTeamIds]}
+                lockedTeamIds={lockedTeamIds}
+                currentPickTeamId={myCurrentPick?.team_id ?? null}
+                currentPickLocked={currentPickLocked}
+              />
+            )}
           </div>
 
           {fixtures && fixtures.length > 0 && (
