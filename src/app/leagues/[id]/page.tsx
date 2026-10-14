@@ -23,6 +23,14 @@ export default async function LeaguePage({
     .eq("id", params.id)
     .maybeSingle();
   if (!league) notFound();
+  const { count: paidCount } = await supabase
+    .from("league_members")
+    .select("user_id", { count: "exact", head: true })
+    .eq("league_id", league.id)
+    .eq("has_paid", true);
+
+  const buyIn = 5;
+  const pool = (paidCount ?? 0) * buyIn;
 
   const { data: me } = await supabase
     .from("league_members")
@@ -151,9 +159,10 @@ export default async function LeaguePage({
           <Link href="/dashboard" className="text-sm text-pl-purple/60 hover:underline">← All leagues</Link>
           <h1 className="text-3xl font-bold mt-1">{league.name}</h1>
           <p className="text-pl-purple/60 text-sm">
-            Gameweek <strong>{league.current_gameweek}</strong> · {provisionalAliveCount} still alive · code{" "}
-            <code className="text-pl-accent-text">{league.code}</code>
-          </p>
+  Gameweek <strong>{league.current_gameweek}</strong> · {provisionalAliveCount} still alive · pool{" "}
+  <strong className="text-pl-accent-text">${pool}</strong> · code{" "}
+  <code className="text-pl-accent-text">{league.code}</code>
+</p>
           <Link href={`/leagues/${league.id}/fixtures`} className="inline-block text-sm text-pl-accent-text hover:underline mt-2">
             View all fixtures →
           </Link>
