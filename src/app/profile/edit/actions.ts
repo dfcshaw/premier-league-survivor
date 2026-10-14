@@ -27,6 +27,7 @@ export async function updateUsername(formData: FormData) {
   const redirectTo = String(formData.get("redirect_to") ?? "/dashboard");
   redirect(redirectTo);
 }
+
 export async function updateEmail(formData: FormData) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -44,6 +45,7 @@ export async function updateEmail(formData: FormData) {
 
   redirect("/profile/edit?message=Check%20your%20new%20email%20to%20confirm%20the%20change");
 }
+
 export async function updateFavoriteClub(formData: FormData) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -62,20 +64,26 @@ export async function updateFavoriteClub(formData: FormData) {
   }
   redirect("/profile/edit?message=Favorite%20club%20updated");
 }
+
 export async function requestPasswordReset() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.email) redirect("/login");
 
-  const origin = headers().get("origin") ?? "";
+  const h = headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const origin = `${proto}://${host}`;
+
   const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+    redirectTo: `${origin}/reset-password`,
   });
   if (error) {
     redirect(`/profile/edit?error=${encodeURIComponent(error.message)}`);
   }
   redirect("/profile/edit?message=Check%20your%20email%20for%20a%20password%20reset%20link");
 }
+
 export async function updateRushmore(formData: FormData) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -86,7 +94,6 @@ export async function updateRushmore(formData: FormData) {
     return { slot, player_id: id };
   });
 
-  // Clear and reinsert
   await supabase.from("profile_rushmore").delete().eq("user_id", user.id);
 
   const rows = picks
@@ -100,8 +107,9 @@ export async function updateRushmore(formData: FormData) {
     }
   }
 
-  redirect("/profile/edit?message=Mount%20Rushmore%20updated");
+  redirect("/profile/edit?message=Top%204%20updated");
 }
+
 export async function uploadAvatar(formData: FormData) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();

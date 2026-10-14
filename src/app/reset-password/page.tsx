@@ -5,11 +5,22 @@ import { setNewPassword } from "./actions";
 export default async function ResetPasswordPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: { error?: string; code?: string };
 }) {
   const supabase = createClient();
+
+  // Exchange code from the email link
+  if (searchParams.code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(searchParams.code);
+    if (error) {
+      redirect(`/login?error=${encodeURIComponent(error.message)}`);
+    }
+    // Reload without the code in the URL so it's not kept in history
+    redirect("/reset-password");
+  }
+
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login?error=Reset%20link%20expired%20—%20try%20again");
+  if (!user) redirect("/login?error=Reset%20link%20expired%20—%20request%20a%20new%20one");
 
   return (
     <section className="max-w-md mx-auto space-y-6">

@@ -10,10 +10,13 @@ export async function requestReset(formData: FormData) {
     redirect("/forgot-password?error=Please%20enter%20a%20valid%20email");
   }
 
-  const origin = headers().get("origin") ?? "";
+  const h = headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const origin = `${proto}://${host}`;
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+    redirectTo: `${origin}/reset-password`,
   });
 
   if (error) {
